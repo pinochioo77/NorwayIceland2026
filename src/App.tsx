@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   AlertTriangle,
   CalendarDays,
@@ -7,7 +7,6 @@ import {
   CircleDollarSign,
   CloudSun,
   ExternalLink,
-  FileCheck2,
   Fuel,
   Hotel,
   Info,
@@ -21,12 +20,12 @@ import {
   Utensils,
 } from 'lucide-react';
 import { drivingNotes, emergencyContacts, packingList, todos } from './data/checklists';
+import { bookings } from './data/generated/bookings';
 import { officialLinks, preTripReviewLinks } from './data/links';
-import { ticketSummaries } from './data/tickets';
 import { totalCost, tripDays } from './data/trip';
-import type { MetricProps, SourceLink, TicketSummary, TripDay } from './types';
+import type { BookingSummary, MetricProps, SourceLink, TripDay } from './types';
 
-const tabs = ['每日行程', '票据与预订', '自驾与路况', '出发前清单', '费用与待办', '紧急联系'] as const;
+const tabs = ['每日行程', '自驾与路况', '出发前清单', '费用与待办', '紧急联系'] as const;
 type Tab = (typeof tabs)[number];
 
 export function App() {
@@ -87,7 +86,6 @@ export function App() {
         </main>
       )}
 
-      {activeTab === '票据与预订' && <TicketsPanel />}
       {activeTab === '自驾与路况' && <DrivingPanel />}
       {activeTab === '出发前清单' && <ChecklistPanel />}
       {activeTab === '费用与待办' && <CostsPanel />}
@@ -109,8 +107,8 @@ function Metric({ icon, label, value }: MetricProps) {
 }
 
 function DayDetail({ day }: { day: TripDay }) {
-  const tickets = useMemo(() => ticketSummaries.filter((ticket) => ticket.date === day.date), [day.date]);
   const dayWarning = criticalDayWarnings[day.date];
+  const dayBookings = bookings.filter((booking) => booking.date === day.date);
 
   return (
     <article className="day-detail">
@@ -154,38 +152,35 @@ function DayDetail({ day }: { day: TripDay }) {
         </section>
       )}
 
-      {tickets.length > 0 && (
-        <section className="linked-tickets" aria-label="当天票据">
-          <h3><TicketCheck aria-hidden /> 当天已预订</h3>
-          <div className="ticket-row">
-            {tickets.map((ticket) => (
-              <MiniTicket ticket={ticket} key={ticket.id} />
-            ))}
-          </div>
-        </section>
-      )}
-
       <section className="timeline" aria-label="当天时间轴">
-        {day.timeline.map((item, index) => (
-          <div className="timeline-row" key={`${item.time}-${item.title}`}>
-            <div className="time">
-              <span>{item.time}</span>
-              <small>{index + 1}</small>
-            </div>
-            <div className="timeline-card">
-              <div className="timeline-title">
-                <h3>{item.title}</h3>
-                <div className="item-flags">
-                  {item.required && <span className="required">必做</span>}
-                  {item.optional && <span className="optional">可选</span>}
-                </div>
+        {day.timeline.map((item, index) => {
+          const itemBookings = dayBookings.filter((booking) => booking.attachTime === item.time);
+
+          return (
+            <div className="timeline-row" key={`${item.time}-${item.title}`}>
+              <div className="time">
+                <span>{item.time}</span>
+                <small>{index + 1}</small>
               </div>
-              <p className="place"><MapPinned aria-hidden />{item.place}</p>
-              {item.transport && <p className="muted"><Car aria-hidden />{item.transport}</p>}
-              {item.note && <p className="note">{item.note}</p>}
+              <div className="timeline-card">
+                <div className="timeline-title">
+                  <h3>{item.title}</h3>
+                  <div className="item-flags">
+                    {itemBookings.length > 0 && <span className="booked"><TicketCheck aria-hidden />已预订</span>}
+                    {item.required && <span className="required">必做</span>}
+                    {item.optional && <span className="optional">可选</span>}
+                  </div>
+                </div>
+                <p className="place"><MapPinned aria-hidden />{item.place}</p>
+                {item.transport && <p className="muted"><Car aria-hidden />{item.transport}</p>}
+                {item.note && <p className="note">{item.note}</p>}
+                {itemBookings.map((booking) => (
+                  <BookingInline booking={booking} key={booking.id} />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       <section className="split-panels">
@@ -229,71 +224,31 @@ function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: s
   );
 }
 
-function TicketsPanel() {
+function BookingInline({ booking }: { booking: BookingSummary }) {
   return (
-    <main className="content-grid">
-      <section className="panel wide">
-        <h2><TicketCheck aria-hidden /> 票据与预订</h2>
-        <p className="section-copy">
-          这里是公开版票据摘要：只显示对旅行有用的时间、地点、供应商、金额和提醒；原始票据、二维码、订单号、票号、姓名、邮箱和电话不公开。
-        </p>
-        <div className="ticket-grid">
-          {ticketSummaries.map((ticket) => (
-            <TicketCard ticket={ticket} key={ticket.id} />
-          ))}
-        </div>
-      </section>
-      <PanelTitle icon={<FileCheck2 />} title="脱敏规则">
-        <ul className="clean-list">
-          <li>不发布原始 PDF / PNG，也不发布打码后的票据截图。</li>
-          <li>金额、供应商、日期、时间、地点可公开；订单号和确认号不公开。</li>
-          <li>后续新增票据先放入本地安全目录，再整理成摘要卡片。</li>
-        </ul>
-      </PanelTitle>
-      <PanelTitle icon={<Sparkles />} title="待复核">
-        <ul className="clean-list">
-          <li>出发前重新核对活动开放时间、集合点和取消政策。</li>
-          <li>机票值机后，把登机牌单独离线保存，不放到公开网页。</li>
-        </ul>
-      </PanelTitle>
-    </main>
-  );
-}
-
-function TicketCard({ ticket }: { ticket: TicketSummary }) {
-  return (
-    <article className="ticket-card">
-      <div className="ticket-head">
-        <span>{ticket.kind}</span>
-        <strong>{ticket.status}</strong>
+    <div className="booking-inline">
+      <div className="booking-head">
+        <span>{booking.kind}</span>
+        <strong>{booking.status}</strong>
       </div>
-      <h3>{ticket.title}</h3>
-      <p className="ticket-vendor">{ticket.vendor}</p>
-      <dl className="ticket-facts">
-        <div><dt>日期</dt><dd>{ticket.dateRange ?? ticket.date}</dd></div>
-        <div><dt>时间</dt><dd>{ticket.primaryTime}</dd></div>
-        <div><dt>地点</dt><dd>{ticket.location}</dd></div>
-        {ticket.amount && <div><dt>金额</dt><dd>{ticket.amount}</dd></div>}
+      <div className="booking-title">
+        <h4>{booking.title}</h4>
+        <p>{booking.vendor}</p>
+      </div>
+      <dl className="booking-facts">
+        <div><dt>时间</dt><dd>{booking.displayTime}</dd></div>
+        <div><dt>地点</dt><dd>{booking.location}</dd></div>
+        {booking.amount && <div><dt>金额</dt><dd>{booking.amount}</dd></div>}
       </dl>
-      <ul className="clean-list compact-list">
-        {ticket.facts.map((fact) => <li key={fact}>{fact}</li>)}
+      <ul className="booking-list">
+        {booking.facts.map((fact) => <li key={fact}>{fact}</li>)}
       </ul>
-      {ticket.reminders.map((reminder) => <p className="note" key={reminder}>{reminder}</p>)}
-      {ticket.links && (
+      {booking.reminder && <p className="note">{booking.reminder}</p>}
+      {booking.links && (
         <div className="link-grid">
-          {ticket.links.map((link) => <LinkButton key={link.url} link={link} />)}
+          {booking.links.map((link) => <LinkButton key={link.url} link={link} />)}
         </div>
       )}
-    </article>
-  );
-}
-
-function MiniTicket({ ticket }: { ticket: TicketSummary }) {
-  return (
-    <div className="mini-ticket">
-      <span>{ticket.kind}</span>
-      <strong>{ticket.title}</strong>
-      <small>{ticket.primaryTime} · {ticket.location}</small>
     </div>
   );
 }

@@ -51,6 +51,7 @@ a {
 h1,
 h2,
 h3,
+h4,
 p {
   margin-top: 0;
 }
@@ -76,6 +77,13 @@ h3 {
   letter-spacing: 0;
 }
 
+h4 {
+  margin-bottom: 4px;
+  font-size: 1rem;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
 .intro,
 .section-copy {
   width: min(820px, 100%);
@@ -96,8 +104,7 @@ h3 {
 .timeline-card,
 .driving-note,
 .emergency-card,
-.ticket-card,
-.mini-ticket {
+.booking-inline {
   border: 1px solid #d9ded4;
   border-radius: 8px;
   background: #fffef9;
@@ -117,7 +124,7 @@ h3 {
 .panel h3 svg,
 .place svg,
 .muted svg,
-.linked-tickets h3 svg {
+.booked svg {
   width: 18px;
   height: 18px;
   flex: 0 0 auto;
@@ -338,9 +345,9 @@ h3 {
 .risk-tag,
 .required,
 .optional,
-.ticket-head span,
-.ticket-head strong,
-.mini-ticket span {
+.booked,
+.booking-head span,
+.booking-head strong {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -365,6 +372,12 @@ h3 {
   background: #dcebd8;
 }
 
+.booked {
+  gap: 5px;
+  color: #123f45;
+  background: #cfeceb;
+}
+
 .quick-facts {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -383,46 +396,11 @@ h3 {
   margin-bottom: 12px;
 }
 
-.linked-tickets {
-  margin: 0 0 14px;
-  padding: 14px;
-  border: 1px solid #c9d7d5;
-  border-radius: 8px;
-  background: #edf7f6;
-}
-
-.linked-tickets h3,
 .panel h2,
 .panel h3 {
   display: flex;
   gap: 8px;
   align-items: center;
-}
-
-.ticket-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
-}
-
-.mini-ticket {
-  padding: 12px;
-}
-
-.mini-ticket span {
-  color: #fff;
-  background: #144f55;
-}
-
-.mini-ticket strong,
-.mini-ticket small {
-  display: block;
-  margin-top: 8px;
-}
-
-.mini-ticket small {
-  color: #56625d;
-  line-height: 1.45;
 }
 
 .timeline {
@@ -456,8 +434,7 @@ h3 {
 }
 
 .timeline-card,
-.panel,
-.ticket-card {
+.panel {
   padding: 14px;
 }
 
@@ -497,6 +474,82 @@ h3 {
   color: #3a453f;
   background: #f0f2eb;
   line-height: 1.58;
+}
+
+.booking-inline {
+  margin-top: 12px;
+  padding: 12px;
+  border-color: #c7d9d7;
+  background: #f4fbfa;
+}
+
+.booking-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.booking-head span {
+  color: #fff;
+  background: #144f55;
+}
+
+.booking-head strong {
+  color: #31513a;
+  background: #dcebd8;
+}
+
+.booking-title p {
+  margin-bottom: 10px;
+  color: #56625d;
+}
+
+.booking-facts {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.booking-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 8px 0;
+  border-bottom: 1px solid #dce7e4;
+}
+
+.booking-facts div:last-child {
+  border-bottom: 0;
+}
+
+.booking-facts dt {
+  color: #69716d;
+}
+
+.booking-facts dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 800;
+}
+
+.booking-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.booking-list li {
+  padding: 5px 8px;
+  border-radius: 999px;
+  color: #28423c;
+  background: #e5efea;
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .split-panels,
@@ -583,7 +636,6 @@ h3 {
   height: 16px;
 }
 
-.ticket-grid,
 .driving-grid,
 .check-grid,
 .emergency-list {
@@ -592,57 +644,12 @@ h3 {
   gap: 10px;
 }
 
-.ticket-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.ticket-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.ticket-head span {
-  color: #fff;
-  background: #144f55;
-}
-
-.ticket-head strong {
-  color: #31513a;
-  background: #dcebd8;
-}
-
-.ticket-vendor {
-  margin-bottom: 12px;
-  color: #56625d;
-}
-
-.ticket-facts {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-}
-
-.ticket-facts div,
 .cost-list div {
   display: flex;
   justify-content: space-between;
   gap: 18px;
   padding: 10px 0;
   border-bottom: 1px solid #e1e4dc;
-}
-
-.ticket-facts dt {
-  color: #69716d;
-}
-
-.ticket-facts dd {
-  margin: 0;
-  text-align: right;
-  font-weight: 800;
 }
 
 .driving-note {
@@ -679,7 +686,7 @@ h3 {
 }
 
 .cost-list div:last-child,
-.ticket-facts div:last-child {
+.booking-facts div:last-child {
   border-bottom: 0;
 }
 
@@ -705,7 +712,6 @@ h3 {
 }
 
 @media (max-width: 1120px) {
-  .ticket-grid,
   .driving-grid,
   .check-grid,
   .emergency-list {
@@ -746,7 +752,6 @@ h3 {
   .quick-facts,
   .split-panels,
   .content-grid,
-  .ticket-grid,
   .driving-grid,
   .check-grid,
   .emergency-list {
@@ -763,11 +768,11 @@ h3 {
   }
 
   .timeline-title,
-  .ticket-facts div {
+  .booking-facts div {
     display: grid;
   }
 
-  .ticket-facts dd {
+  .booking-facts dd {
     text-align: left;
   }
 

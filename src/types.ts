@@ -42,22 +42,23 @@ export type ChecklistItem = {
   detail?: string;
 };
 
-export type TicketKind = '交通' | '住宿' | '活动' | '租车';
+export type BookingKind = '交通' | '住宿' | '活动' | '租车';
 
-export type TicketSummary = {
+export type BookingSummary = {
   id: string;
   date: string;
-  dateRange?: string;
-  kind: TicketKind;
+  attachTime: string;
+  kind: BookingKind;
   title: string;
   vendor: string;
-  primaryTime: string;
   location: string;
+  displayTime: string;
   amount?: string;
   status: string;
   facts: string[];
-  reminders: string[];
+  reminder?: string;
   links?: SourceLink[];
+  sortOrder: number;
 };
 
 export type MetricProps = {
