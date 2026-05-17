@@ -10,7 +10,6 @@ import {
   ExternalLink,
   Fuel,
   Hotel,
-  ImageIcon,
   Info,
   Luggage,
   MapPinned,
@@ -295,23 +294,27 @@ function NodeTools({ places: placeInfos }: { places: PlaceInfo[] }) {
       {placeInfos.map((place) => (
         <div className="node-tool" key={place.id}>
           {place.localImage && (
-            <a className="node-image" href={place.localImage} target="_blank" rel="noreferrer" aria-label={`${place.title} 图片`}>
+            <div className="node-image" aria-label={`${place.title} 图片`}>
               <img src={place.localImage} alt={`${place.place} 参考图`} loading="lazy" />
-            </a>
+            </div>
           )}
           <div className="node-tool-main">
             <div className="node-tool-title">
               <strong>{place.place}</strong>
               <small>{place.title}</small>
             </div>
+            {place.description && <p className="node-description">{place.description}</p>}
             <div className="node-link-row">
-              {place.introUrl && <TinyLink href={place.introUrl} label="介绍" icon={<Info aria-hidden />} />}
-              {place.localImage && <TinyLink href={place.localImage} label="图片" icon={<ImageIcon aria-hidden />} />}
               {place.mapUrl && <TinyLink href={place.mapUrl} label="地图" icon={<MapPinned aria-hidden />} />}
               {place.parkingUrl && <TinyLink href={place.parkingUrl} label="停车" icon={<ParkingCircle aria-hidden />} />}
-              {place.imageSourceUrl && <TinyLink href={place.imageSourceUrl} label="图源" icon={<ExternalLink aria-hidden />} />}
+              {place.introUrl && <TinyLink href={place.introUrl} label="来源" icon={<Info aria-hidden />} />}
             </div>
             {place.parkingNote && <p className="parking-note">{place.parkingNote}</p>}
+            {place.imageSourceUrl && place.localImage && (
+              <a className="image-credit" href={place.imageSourceUrl} target="_blank" rel="noreferrer">
+                图片来源 <ExternalLink aria-hidden />
+              </a>
+            )}
           </div>
         </div>
       ))}

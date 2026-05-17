@@ -125,6 +125,7 @@ function normalizePlaceRow(row) {
     attachTime: required(row.attach_time, 'attach_time'),
     place: required(row.place, 'place'),
     title: required(row.title, 'title'),
+    description: optional(row.description_public),
     introUrl: optional(row.intro_url),
     imageSourceUrl: optional(row.image_source_url),
     localImage: optional(row.local_image),

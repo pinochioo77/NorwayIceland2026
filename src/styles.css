@@ -489,7 +489,7 @@ h4 {
 
 .node-tool {
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
+  grid-template-columns: minmax(140px, 190px) minmax(0, 1fr);
   gap: 12px;
   padding: 10px;
   background: #fbfcf7;
@@ -530,6 +530,12 @@ h4 {
   line-height: 1.45;
 }
 
+.node-description {
+  margin: 0 0 10px;
+  color: #3f4b46;
+  line-height: 1.58;
+}
+
 .node-link-row {
   display: flex;
   gap: 6px;
@@ -561,6 +567,21 @@ h4 {
   color: #5d675f;
   font-size: 0.86rem;
   line-height: 1.5;
+}
+
+.image-credit {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 8px;
+  color: #69716d;
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
+.image-credit svg {
+  width: 13px;
+  height: 13px;
 }
 
 .booking-inline {

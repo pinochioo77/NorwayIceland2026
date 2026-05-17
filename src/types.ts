@@ -24,6 +24,7 @@ export type PlaceInfo = {
   attachTime: string;
   place: string;
   title: string;
+  description?: string;
   introUrl?: string;
   imageSourceUrl?: string;
   localImage?: string;
