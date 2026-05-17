@@ -4,6 +4,59 @@ import type { BookingSummary } from '../../types';
 // Do not edit by hand; update the private workbook instead.
 export const bookings: BookingSummary[] = [
   {
+    "id": "ay088-pvg-hel",
+    "date": "9/25",
+    "attachTime": "20:50-05:55+1",
+    "kind": "交通",
+    "title": "上海 → 赫尔辛基机票",
+    "vendor": "Trip.com / Finnair",
+    "location": "Shanghai Pudong T2 → Helsinki-Vantaa",
+    "displayTime": "9/25 20:50 - 9/26 05:55",
+    "amount": "CNY 12,737 / 乘客项",
+    "status": "已出票",
+    "facts": [
+      "航班 Finnair AY088",
+      "经济舱",
+      "次日清晨到达 Helsinki-Vantaa",
+      "后续衔接 AY911 前往奥斯陆"
+    ],
+    "reminder": "国际航班建议至少提前 2 小时到达机场；证件和登机资料离线保存。",
+    "links": [
+      {
+        "label": "Finnair 官方站",
+        "url": "https://www.finnair.com/",
+        "kind": "交通"
+      }
+    ],
+    "sortOrder": 5
+  },
+  {
+    "id": "ay911-hel-osl",
+    "date": "9/26",
+    "attachTime": "05:55-07:50",
+    "kind": "交通",
+    "title": "赫尔辛基 → 奥斯陆机票",
+    "vendor": "Trip.com / Finnair",
+    "location": "Helsinki-Vantaa → Oslo Airport",
+    "displayTime": "9/26 07:25 - 07:50",
+    "amount": "CNY 12,737 / 乘客项内含",
+    "status": "已出票",
+    "facts": [
+      "航班 Finnair AY911",
+      "经济舱",
+      "抵达奥斯陆后入境取行李并进城"
+    ],
+    "reminder": "同一国际行程内转机，按现场登机口和航空公司通知为准。",
+    "links": [
+      {
+        "label": "Finnair 官方站",
+        "url": "https://www.finnair.com/",
+        "kind": "交通"
+      }
+    ],
+    "sortOrder": 6
+  },
+  {
     "id": "fjord-cruise",
     "date": "9/27",
     "attachTime": "15:00-17:00",
@@ -45,8 +98,34 @@ export const bookings: BookingSummary[] = [
       "经济舱",
       "当天后续继续转机前往冰岛"
     ],
-    "reminder": "乘机证件、登机牌和行程单离线保存；不公开乘客姓名、订座号和订单号。",
+    "reminder": "乘机证件、登机牌和行程单离线保存；不公开个人或票务识别信息。",
     "sortOrder": 20
+  },
+  {
+    "id": "sk4785-osl-kef",
+    "date": "9/29",
+    "attachTime": "17:15-18:05",
+    "kind": "交通",
+    "title": "奥斯陆 → 凯夫拉维克机票",
+    "vendor": "Trip.com / SAS",
+    "location": "Oslo Airport → Keflavik International Airport",
+    "displayTime": "17:15-18:05",
+    "amount": "CNY 1,154 / 乘客项",
+    "status": "已出票",
+    "facts": [
+      "航班 Scandinavian Airlines SK4785",
+      "经济舱",
+      "到达 KEF 后衔接入境、取行李和 Hertz 取车"
+    ],
+    "reminder": "冰岛落地后仍要取车和补给，当天不追加景点。",
+    "links": [
+      {
+        "label": "SAS 官方站",
+        "url": "https://www.flysas.com/",
+        "kind": "交通"
+      }
+    ],
+    "sortOrder": 25
   },
   {
     "id": "hertz-iceland",
@@ -117,5 +196,57 @@ export const bookings: BookingSummary[] = [
       }
     ],
     "sortOrder": 50
+  },
+  {
+    "id": "ay992-kef-hel",
+    "date": "10/5",
+    "attachTime": "08:35-15:00",
+    "kind": "交通",
+    "title": "凯夫拉维克 → 赫尔辛基机票",
+    "vendor": "Trip.com / Finnair",
+    "location": "Keflavik International Airport → Helsinki-Vantaa",
+    "displayTime": "08:35-15:00",
+    "amount": "CNY 12,737 / 乘客项内含",
+    "status": "已出票",
+    "facts": [
+      "航班 Finnair AY992",
+      "经济舱",
+      "抵达赫尔辛基后可按状态 citywalk"
+    ],
+    "reminder": "早班机前先完成还车和安检；若延误或体力不足，赫尔辛基只留机场。",
+    "links": [
+      {
+        "label": "Finnair 官方站",
+        "url": "https://www.finnair.com/",
+        "kind": "交通"
+      }
+    ],
+    "sortOrder": 60
+  },
+  {
+    "id": "ay087-hel-pvg",
+    "date": "10/6",
+    "attachTime": "01:00-18:25",
+    "kind": "交通",
+    "title": "赫尔辛基 → 上海机票",
+    "vendor": "Trip.com / Finnair",
+    "location": "Helsinki-Vantaa → Shanghai Pudong T2",
+    "displayTime": "01:00-18:25",
+    "amount": "CNY 12,737 / 乘客项内含",
+    "status": "已出票",
+    "facts": [
+      "航班 Finnair AY087",
+      "经济舱",
+      "傍晚抵达上海浦东"
+    ],
+    "reminder": "长途返程日，落地后预留取行李和回家交通时间。",
+    "links": [
+      {
+        "label": "Finnair 官方站",
+        "url": "https://www.finnair.com/",
+        "kind": "交通"
+      }
+    ],
+    "sortOrder": 70
   }
 ];

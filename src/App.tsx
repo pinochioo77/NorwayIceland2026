@@ -3,16 +3,19 @@ import {
   AlertTriangle,
   CalendarDays,
   Car,
+  ChevronDown,
   CheckCircle2,
   CircleDollarSign,
   CloudSun,
   ExternalLink,
   Fuel,
   Hotel,
+  ImageIcon,
   Info,
   Luggage,
   MapPinned,
   Navigation,
+  ParkingCircle,
   Phone,
   ShieldAlert,
   Sparkles,
@@ -21,9 +24,10 @@ import {
 } from 'lucide-react';
 import { drivingNotes, emergencyContacts, packingList, todos } from './data/checklists';
 import { bookings } from './data/generated/bookings';
+import { places } from './data/generated/places';
 import { officialLinks, preTripReviewLinks } from './data/links';
 import { totalCost, tripDays } from './data/trip';
-import type { BookingSummary, MetricProps, SourceLink, TripDay } from './types';
+import type { BookingSummary, MetricProps, PlaceInfo, SourceLink, TripDay, TimelineItem } from './types';
 
 const tabs = ['每日行程', '自驾与路况', '出发前清单', '费用与待办', '紧急联系'] as const;
 type Tab = (typeof tabs)[number];
@@ -40,12 +44,12 @@ export function App() {
           <p className="eyebrow">Norway / Iceland / Helsinki</p>
           <h1>挪威冰岛同行行程</h1>
           <p className="intro">
-            9/25-10/5，从上海到奥斯陆、挪威峡湾、卑尔根、冰岛南岸，再经赫尔辛基返程。
+            9/25-10/6，从上海到奥斯陆、挪威峡湾、卑尔根、冰岛南岸，再经赫尔辛基返程。
             这是给同行伙伴看的公开版，票据只保留脱敏摘要。
           </p>
         </div>
         <div className="status-grid" aria-label="旅行总览">
-          <Metric icon={<CalendarDays />} label="日期" value="9/25 - 10/5" />
+          <Metric icon={<CalendarDays />} label="日期" value="9/25 - 10/6" />
           <Metric icon={<Navigation />} label="主线" value="Oslo → Bergen → Iceland" />
           <Metric icon={<CircleDollarSign />} label="预算" value={totalCost} />
           <Metric icon={<ShieldAlert />} label="重点风险" value="10/2-10/4 冰岛长线" />
@@ -109,6 +113,7 @@ function Metric({ icon, label, value }: MetricProps) {
 function DayDetail({ day }: { day: TripDay }) {
   const dayWarning = criticalDayWarnings[day.date];
   const dayBookings = bookings.filter((booking) => booking.date === day.date);
+  const dayPlaces = places.filter((place) => place.date === day.date);
 
   return (
     <article className="day-detail">
@@ -155,6 +160,9 @@ function DayDetail({ day }: { day: TripDay }) {
       <section className="timeline" aria-label="当天时间轴">
         {day.timeline.map((item, index) => {
           const itemBookings = dayBookings.filter((booking) => booking.attachTime === item.time);
+          const itemPlaces = dayPlaces.filter((place) => place.attachTime === item.time);
+          const hasStayBooking = itemBookings.some((booking) => booking.kind === '住宿');
+          const showStaySlot = isStayNode(item) && !hasStayBooking;
 
           return (
             <div className="timeline-row" key={`${item.time}-${item.title}`}>
@@ -174,9 +182,11 @@ function DayDetail({ day }: { day: TripDay }) {
                 <p className="place"><MapPinned aria-hidden />{item.place}</p>
                 {item.transport && <p className="muted"><Car aria-hidden />{item.transport}</p>}
                 {item.note && <p className="note">{item.note}</p>}
+                {itemPlaces.length > 0 && <NodeTools places={itemPlaces} />}
                 {itemBookings.map((booking) => (
                   <BookingInline booking={booking} key={booking.id} />
                 ))}
+                {showStaySlot && <StayBookingSlot stay={day.stay} />}
               </div>
             </div>
           );
@@ -197,6 +207,10 @@ function DayDetail({ day }: { day: TripDay }) {
       </section>
     </article>
   );
+}
+
+function isStayNode(item: TimelineItem) {
+  return /入住|住宿|酒店|Guesthouse|Scandic|B47|Citybox|Lighthouse/i.test(`${item.title} ${item.place}`);
 }
 
 const criticalDayWarnings: Record<string, { title: string; message: string }> = {
@@ -226,30 +240,91 @@ function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: s
 
 function BookingInline({ booking }: { booking: BookingSummary }) {
   return (
-    <div className="booking-inline">
-      <div className="booking-head">
-        <span>{booking.kind}</span>
-        <strong>{booking.status}</strong>
+    <details className="booking-inline">
+      <summary>
+        <span className="booking-kind">{booking.kind}</span>
+        <span className="booking-summary-main">
+          <strong>{booking.title}</strong>
+          <small>{booking.vendor} · {booking.displayTime}</small>
+        </span>
+        <span className="booking-status">{booking.status}</span>
+        <ChevronDown aria-hidden />
+      </summary>
+      <div className="booking-body">
+        <dl className="booking-facts">
+          <div><dt>时间</dt><dd>{booking.displayTime}</dd></div>
+          <div><dt>地点</dt><dd>{booking.location}</dd></div>
+          {booking.amount && <div><dt>金额</dt><dd>{booking.amount}</dd></div>}
+        </dl>
+        <ul className="booking-list">
+          {booking.facts.map((fact) => <li key={fact}>{fact}</li>)}
+        </ul>
+        {booking.reminder && <p className="note">{booking.reminder}</p>}
+        {booking.links && (
+          <div className="link-grid">
+            {booking.links.map((link) => <LinkButton key={link.url} link={link} />)}
+          </div>
+        )}
       </div>
-      <div className="booking-title">
-        <h4>{booking.title}</h4>
-        <p>{booking.vendor}</p>
+    </details>
+  );
+}
+
+function StayBookingSlot({ stay }: { stay: string }) {
+  return (
+    <details className="booking-inline stay-slot">
+      <summary>
+        <span className="booking-kind">住宿</span>
+        <span className="booking-summary-main">
+          <strong>住宿预订窗口</strong>
+          <small>{stay}</small>
+        </span>
+        <span className="booking-status muted-status">待整理</span>
+        <ChevronDown aria-hidden />
+      </summary>
+      <div className="booking-body">
+        <p className="note">后续住宿票据整理后，先写入 Excel 的公开摘要，再自动同步到这里。</p>
       </div>
-      <dl className="booking-facts">
-        <div><dt>时间</dt><dd>{booking.displayTime}</dd></div>
-        <div><dt>地点</dt><dd>{booking.location}</dd></div>
-        {booking.amount && <div><dt>金额</dt><dd>{booking.amount}</dd></div>}
-      </dl>
-      <ul className="booking-list">
-        {booking.facts.map((fact) => <li key={fact}>{fact}</li>)}
-      </ul>
-      {booking.reminder && <p className="note">{booking.reminder}</p>}
-      {booking.links && (
-        <div className="link-grid">
-          {booking.links.map((link) => <LinkButton key={link.url} link={link} />)}
+    </details>
+  );
+}
+
+function NodeTools({ places: placeInfos }: { places: PlaceInfo[] }) {
+  return (
+    <div className="node-tools">
+      {placeInfos.map((place) => (
+        <div className="node-tool" key={place.id}>
+          {place.localImage && (
+            <a className="node-image" href={place.localImage} target="_blank" rel="noreferrer" aria-label={`${place.title} 图片`}>
+              <img src={place.localImage} alt={`${place.place} 参考图`} loading="lazy" />
+            </a>
+          )}
+          <div className="node-tool-main">
+            <div className="node-tool-title">
+              <strong>{place.place}</strong>
+              <small>{place.title}</small>
+            </div>
+            <div className="node-link-row">
+              {place.introUrl && <TinyLink href={place.introUrl} label="介绍" icon={<Info aria-hidden />} />}
+              {place.localImage && <TinyLink href={place.localImage} label="图片" icon={<ImageIcon aria-hidden />} />}
+              {place.mapUrl && <TinyLink href={place.mapUrl} label="地图" icon={<MapPinned aria-hidden />} />}
+              {place.parkingUrl && <TinyLink href={place.parkingUrl} label="停车" icon={<ParkingCircle aria-hidden />} />}
+              {place.imageSourceUrl && <TinyLink href={place.imageSourceUrl} label="图源" icon={<ExternalLink aria-hidden />} />}
+            </div>
+            {place.parkingNote && <p className="parking-note">{place.parkingNote}</p>}
+          </div>
         </div>
-      )}
+      ))}
     </div>
+  );
+}
+
+function TinyLink({ href, label, icon }: { href: string; label: string; icon: ReactNode }) {
+  return (
+    <a className="tiny-link" href={href} target="_blank" rel="noreferrer">
+      {icon}
+      {label}
+    </a>
   );
 }
 

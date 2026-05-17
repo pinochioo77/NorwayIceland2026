@@ -13,7 +13,11 @@ const rules = [
   { name: 'Chinese ID number', pattern: /\b[1-9]\d{5}(?:19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[\dXx]\b/ },
   { name: 'long booking-like number', pattern: /\b\d{12,}\b/ },
   { name: 'ticket or booking reference', pattern: /\b[A-Z]{2,6}-?\d{6,}\b/ },
+  { name: 'passenger-name style token', pattern: /\b[A-Z]{2,}\/[A-Z]{2,}\b/ },
+  { name: 'private reference label', pattern: /\b(?:PNR|订座号|票号|订单号|确认号|身份证|护照)\b/i },
 ];
+
+const unsafePublicFileNamePattern = /(?:机票|票据|行程单|订单|确认号|ticket|boarding|pnr|passport|id-card|idcard|\.pdf$)/i;
 
 const failures = [];
 
@@ -42,12 +46,17 @@ function walk(dir) {
 
 for (const scanRoot of scanRoots) {
   for (const file of walk(join(root, scanRoot))) {
+    const relativePath = relative(root, file);
+    if (unsafePublicFileNamePattern.test(relativePath)) {
+      failures.push(`raw ticket-like public file name: ${relativePath}`);
+    }
+
     const ext = file.slice(file.lastIndexOf('.')).toLowerCase();
     if (!textExts.has(ext)) continue;
     const text = readFileSync(file, 'utf8');
     for (const rule of rules) {
       if (rule.pattern.test(text)) {
-        failures.push(`${rule.name}: ${relative(root, file)}`);
+        failures.push(`${rule.name}: ${relativePath}`);
       }
     }
   }

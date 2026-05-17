@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type LinkKind = '官方' | '地图' | '天气' | '安全' | '交通' | '使馆';
+export type LinkKind = '官方' | '地图' | '天气' | '安全' | '交通' | '使馆' | '介绍' | '图片' | '停车';
 
 export type SourceLink = {
   label: string;
@@ -16,6 +16,21 @@ export type TimelineItem = {
   note?: string;
   required?: boolean;
   optional?: boolean;
+};
+
+export type PlaceInfo = {
+  id: string;
+  date: string;
+  attachTime: string;
+  place: string;
+  title: string;
+  introUrl?: string;
+  imageSourceUrl?: string;
+  localImage?: string;
+  mapUrl?: string;
+  parkingUrl?: string;
+  parkingNote?: string;
+  sortOrder: number;
 };
 
 export type TripDay = {
