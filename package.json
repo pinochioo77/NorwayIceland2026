@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
+    "check:privacy": "node scripts/check-privacy.mjs",
+    "import:data": "node scripts/import-safe-data.mjs",
+    "verify": "npm run build && npm run check:privacy",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
@@ -18,6 +21,7 @@
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "xlsx": "^0.18.5"
   }
 }
