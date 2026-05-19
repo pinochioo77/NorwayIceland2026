@@ -4,6 +4,7 @@ dist/
 *.local
 Data_Safe/
 Data_safe/
+animal-island-ui-main/
 plan.md
 *.xlsx
 *.xlsm
