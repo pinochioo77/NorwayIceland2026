@@ -174,6 +174,7 @@ function normalizeLodgingRow(row) {
     amount: optional(row.amount),
     cancelPolicy: optional(row.cancel_policy),
     note: optional(row.note_public),
+    images: splitList(row.local_images),
     sortOrder: Number(row.sort_order || 0),
   };
 }

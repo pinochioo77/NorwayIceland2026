@@ -298,7 +298,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://visitreykjavik.is/",
     "mapUrl": "https://www.google.com/maps/search/Reykjavik+%2F+B47",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Reykjavik+%2F+B47",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 260
   },
   {
@@ -311,7 +310,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.hallgrimskirkja.is/en",
     "mapUrl": "https://www.google.com/maps/search/Hallgrimskirkja",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Hallgrimskirkja",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 270
   },
   {
@@ -324,7 +322,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://visitreykjavik.is/",
     "mapUrl": "https://www.google.com/maps/search/Reykjavik++to++Reykjanes+Peninsula",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Reykjavik++to++Reykjanes+Peninsula",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 280
   },
   {
@@ -339,7 +336,6 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/seltun-reykjanes.jpg",
     "mapUrl": "https://www.google.com/maps/search/Reykjanes+Peninsula",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Reykjanes+Peninsula",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 290
   },
   {
@@ -367,7 +363,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://visitreykjavik.is/",
     "mapUrl": "https://www.google.com/maps/search/Sky+Lagoon++to++B47",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Sky+Lagoon++to++B47",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 310
   },
   {
@@ -393,7 +388,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/thingvellir.jpg",
     "mapUrl": "https://www.google.com/maps/search/Thingvellir+National+Park",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Thingvellir+National+Park",
-    "parkingNote": "停车费：Parka/现场复核；厕所：游客中心/服务点，费用现场复核。",
+    "parkingNote": "厕所：游客中心/服务点。",
     "sortOrder": 330
   },
   {
@@ -419,7 +414,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/geysir.jpg",
     "mapUrl": "https://www.google.com/maps/search/Geysir+Geothermal+Area",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Geysir+Geothermal+Area",
-    "parkingNote": "停车费：通常按现场标识；厕所：游客中心区域，费用现场复核。",
+    "parkingNote": "厕所：游客中心区域。",
     "sortOrder": 350
   },
   {
@@ -445,7 +440,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/gullfoss.jpg",
     "mapUrl": "https://www.google.com/maps/search/Gullfoss+Waterfall",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Gullfoss+Waterfall",
-    "parkingNote": "停车费：按现场标识复核；厕所：游客中心区域，费用现场复核。",
+    "parkingNote": "厕所：游客中心区域。",
     "sortOrder": 370
   },
   {
@@ -469,7 +464,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/towns-villages/hella",
     "mapUrl": "https://www.google.com/maps/search/Hella+%2F+Ugla+Guesthouse",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Hella+%2F+Ugla+Guesthouse",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 380
   },
   {
@@ -484,7 +478,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/kerid.jpg",
     "mapUrl": "https://www.google.com/maps/search/Kerid+Crater",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Kerid+Crater",
-    "parkingNote": "入口/停车：按景区现场收费；厕所：入口或附近服务点现场复核。",
+    "parkingNote": "厕所：入口或附近服务点。",
     "sortOrder": 390
   },
   {
@@ -499,7 +493,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/seljalandsfoss.jpg",
     "mapUrl": "https://www.google.com/maps/search/Seljalandsfoss+%2B+Gljufrabui",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Seljalandsfoss+%2B+Gljufrabui",
-    "parkingNote": "停车费：按 Parka/现场复核；厕所：停车场区域，费用现场复核。",
+    "parkingNote": "厕所：停车场区域。",
     "sortOrder": 390
   },
   {
@@ -527,7 +521,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/skogafoss.jpg",
     "mapUrl": "https://www.google.com/maps/search/Skogafoss",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Skogafoss",
-    "parkingNote": "停车费：按现场标识复核；厕所：游客服务区，费用现场复核。",
+    "parkingNote": "厕所：游客服务区。",
     "sortOrder": 400
   },
   {
@@ -555,7 +549,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/kvernufoss.jpg",
     "mapUrl": "https://www.google.com/maps/search/Kvernufoss",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Kvernufoss",
-    "parkingNote": "停车费：按现场标识复核；厕所：Skógar/附近服务区现场复核。",
+    "parkingNote": "厕所：Skógar / 附近服务区。",
     "sortOrder": 410
   },
   {
@@ -570,7 +564,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/dyrholaey.jpg",
     "mapUrl": "https://www.google.com/maps/search/Dyrholaey",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Dyrholaey",
-    "parkingNote": "停车费：按现场标识复核；厕所：出发前在 Vík 或服务区解决。",
+    "parkingNote": "厕所：出发前在 Vík 或服务区解决。",
     "sortOrder": 420
   },
   {
@@ -583,7 +577,7 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/place/reynisfjara-black-sand-beach",
     "mapUrl": "https://www.google.com/maps/search/Reynisfjara+Black+Sand+Beach",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Reynisfjara+Black+Sand+Beach",
-    "parkingNote": "停车费：按 Parka/现场复核；厕所：停车/餐饮区，费用现场复核；不靠近浪线。",
+    "parkingNote": "厕所：停车/餐饮区；不靠近浪线。",
     "sortOrder": 430
   },
   {
@@ -609,7 +603,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/place/hali-country-hotel",
     "mapUrl": "https://www.google.com/maps/search/Vik++to++Hali+%2F+Skyrh%C3%BAsi%C3%B0+Guesthouse",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Vik++to++Hali+%2F+Skyrh%C3%BAsi%C3%B0+Guesthouse",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 450
   },
   {
@@ -622,7 +615,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/place/hali-country-hotel",
     "mapUrl": "https://www.google.com/maps/search/Skyrh%C3%BAsi%C3%B0+Guesthouse",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Skyrh%C3%BAsi%C3%B0+Guesthouse",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 460
   },
   {
@@ -635,7 +627,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/place/hali-country-hotel",
     "mapUrl": "https://www.google.com/maps/search/Skyrh%C3%BAsi%C3%B0+Guesthouse",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Skyrh%C3%BAsi%C3%B0+Guesthouse",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 470
   },
   {
@@ -650,7 +641,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/glacier-adventure-base-camp-hali-781-is.jpg",
     "mapUrl": "https://www.google.com/maps/search/Glacier+Adventure+Base+Camp+Hali+781+IS",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Glacier+Adventure+Base+Camp+Hali+781+IS",
-    "parkingNote": "停车费：活动集合点现场复核；厕所：基地/集合点现场复核。",
+    "parkingNote": "厕所：基地/集合点。",
     "sortOrder": 480
   },
   {
@@ -678,7 +669,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/fjallsarlon.jpg",
     "mapUrl": "https://www.google.com/maps/search/Fjallsarlon",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Fjallsarlon",
-    "parkingNote": "停车费：现场复核；厕所：服务区/停车区现场复核。",
+    "parkingNote": "厕所：服务区/停车区。",
     "sortOrder": 500
   },
   {
@@ -693,7 +684,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/jokulsarlon.jpg",
     "mapUrl": "https://www.google.com/maps/search/J%C3%B6kuls%C3%A1rl%C3%B3n+Glacier+Lagoon",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+J%C3%B6kuls%C3%A1rl%C3%B3n+Glacier+Lagoon",
-    "parkingNote": "停车费：Parka/现场复核；厕所：服务区现场复核。",
+    "parkingNote": "厕所：服务区。",
     "sortOrder": 510
   },
   {
@@ -706,7 +697,7 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/place/diamond-beach",
     "mapUrl": "https://www.google.com/maps/search/Diamond+Beach",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Diamond+Beach",
-    "parkingNote": "停车费：Parka/现场复核；厕所：冰河湖服务区或现场复核。",
+    "parkingNote": "厕所：冰河湖服务区。",
     "sortOrder": 520
   },
   {
@@ -719,7 +710,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/towns-villages/hofn",
     "mapUrl": "https://www.google.com/maps/search/%E5%86%B0%E6%B2%B3%E6%B9%96++to++H%C3%B6fn",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+%E5%86%B0%E6%B2%B3%E6%B9%96++to++H%C3%B6fn",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 530
   },
   {
@@ -732,7 +722,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/towns-villages/hofn",
     "mapUrl": "https://www.google.com/maps/search/Sau%C3%B0anes+Guesthouse",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Sau%C3%B0anes+Guesthouse",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 540
   },
   {
@@ -745,7 +734,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/place/fjadrargljufur-canyon",
     "mapUrl": "https://www.google.com/maps/search/H%C3%B6fn++to++Fja%C3%B0r%C3%A1rglj%C3%BAfur",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+H%C3%B6fn++to++Fja%C3%B0r%C3%A1rglj%C3%BAfur",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 550
   },
   {
@@ -760,7 +748,7 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/fjadrargljufur.jpg",
     "mapUrl": "https://www.google.com/maps/search/Fja%C3%B0r%C3%A1rglj%C3%BAfur+Canyon",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Fja%C3%B0r%C3%A1rglj%C3%BAfur+Canyon",
-    "parkingNote": "停车费：Parka/现场复核；厕所：停车区现场复核。",
+    "parkingNote": "厕所：停车区。",
     "sortOrder": 560
   },
   {
@@ -775,7 +763,6 @@ export const places: PlaceInfo[] = [
     "localImage": "./assets/places/vik.jpg",
     "mapUrl": "https://www.google.com/maps/search/%E5%BE%80+Vik+%2F+Hvolsv%C3%B6llur+%E6%96%B9%E5%90%91%E8%BF%94%E7%A8%8B",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+%E5%BE%80+Vik+%2F+Hvolsv%C3%B6llur+%E6%96%B9%E5%90%91%E8%BF%94%E7%A8%8B",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 570
   },
   {
@@ -788,7 +775,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.south.is/en/destinations/travel-routes/the-south-coast",
     "mapUrl": "https://www.google.com/maps/search/%E5%8D%97%E5%B2%B8%E8%A1%A5%E6%BC%8F%E7%82%B9",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+%E5%8D%97%E5%B2%B8%E8%A1%A5%E6%BC%8F%E7%82%B9",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 580
   },
   {
@@ -801,7 +787,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://lighthouseinn.is/",
     "mapUrl": "https://www.google.com/maps/search/%E5%8D%97%E5%B2%B8++to++Keflavik+%2F+Gar%C3%B0ur",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+%E5%8D%97%E5%B2%B8++to++Keflavik+%2F+Gar%C3%B0ur",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 590
   },
   {
@@ -814,7 +799,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://lighthouseinn.is/",
     "mapUrl": "https://www.google.com/maps/search/Lighthouse-Inn",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Lighthouse-Inn",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 600
   },
   {
@@ -827,7 +811,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://lighthouseinn.is/",
     "mapUrl": "https://www.google.com/maps/search/Lighthouse-Inn",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Lighthouse-Inn",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 610
   },
   {
@@ -840,7 +823,6 @@ export const places: PlaceInfo[] = [
     "introUrl": "https://www.isavia.is/en/keflavik-airport",
     "mapUrl": "https://www.google.com/maps/search/Keflavik+Airport+%2F+KEF",
     "parkingUrl": "https://www.google.com/maps/search/parking+near+Keflavik+Airport+%2F+KEF",
-    "parkingNote": "停车/厕所费用：按现场标识、Parka 或 EasyPark 复核。",
     "sortOrder": 620
   },
   {

@@ -277,6 +277,13 @@ function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
         <ChevronDown aria-hidden />
       </summary>
       <div className="booking-body">
+        {lodging.images.length > 0 && (
+          <div className="lodging-gallery" aria-label={`${lodging.name} 图片`}>
+            {lodging.images.map((image) => (
+              <img src={image} alt={`${lodging.name} 外观参考`} loading="lazy" key={image} />
+            ))}
+          </div>
+        )}
         <dl className="booking-facts">
           <div><dt>入住 / 退房</dt><dd>{lodging.checkIn} {lodging.checkInTime || ''} → {lodging.checkOut} {lodging.checkOutTime || ''}</dd></div>
           {lodging.address && <div><dt>地址</dt><dd>{lodging.address}</dd></div>}

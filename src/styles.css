@@ -14,6 +14,9 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(244, 245, 239, 0.72), rgba(244, 245, 239, 0.9)),
+    url("./assets/ui/home_bg.webp") center top / 720px auto fixed;
 }
 
 button,
@@ -32,11 +35,37 @@ a {
 }
 
 .topbar {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.75fr);
   gap: 24px;
   align-items: end;
-  padding: 26px 0 18px;
+  min-height: 260px;
+  padding: 28px;
+  border: 2px solid #255f64;
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255, 254, 249, 0.96), rgba(230, 242, 235, 0.92)),
+    url("./assets/ui/wave-yellow.svg") right -30px bottom -22px / 310px auto no-repeat;
+  box-shadow: 0 16px 0 rgba(20, 79, 85, 0.11);
+}
+
+.topbar::after {
+  position: absolute;
+  right: 28px;
+  bottom: -34px;
+  width: min(280px, 26vw);
+  aspect-ratio: 1.62;
+  background: url("./assets/ui/travel-companions.png") center / contain no-repeat;
+  opacity: 0.18;
+  content: "";
+  pointer-events: none;
+}
+
+.topbar > * {
+  position: relative;
+  z-index: 1;
 }
 
 .eyebrow {
@@ -195,7 +224,9 @@ h4 {
   align-items: center;
   padding: 16px;
   border: 1px solid #d9ded4;
-  background: #eef2ea;
+  background:
+    linear-gradient(90deg, rgba(238, 242, 234, 0.98), rgba(255, 252, 226, 0.9)),
+    url("./assets/ui/footer-sea.svg") right bottom / 260px auto no-repeat;
 }
 
 .review-strip h2 {
@@ -644,6 +675,21 @@ h4 {
   margin-top: 12px;
 }
 
+.lodging-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.lodging-gallery img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #e7ebe2;
+}
+
 .booking-facts {
   display: grid;
   gap: 8px;
@@ -934,6 +980,15 @@ h4 {
   .day-hero,
   .review-strip {
     grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    min-height: 0;
+  }
+
+  .topbar::after {
+    width: 220px;
+    opacity: 0.11;
   }
 
   .day-nav {

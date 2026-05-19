@@ -23,6 +23,9 @@ export const lodgings: LodgingSummary[] = [
     "amount": "RMB 792.09",
     "cancelPolicy": "不可退款",
     "note": "第一晚轻量入住，次日早班去 Oslo S。",
+    "images": [
+      "./assets/lodgings/scandic-grensen-1.png"
+    ],
     "sortOrder": 10
   },
   {
@@ -47,6 +50,9 @@ export const lodgings: LodgingSummary[] = [
     "amount": "RMB 940.72",
     "cancelPolicy": "不可退款",
     "note": "挪威缩影抵达后休整，车站附近住宿。",
+    "images": [
+      "./assets/lodgings/scandic-voss-1.png"
+    ],
     "sortOrder": 20
   },
   {
@@ -71,6 +77,9 @@ export const lodgings: LodgingSummary[] = [
     "amount": "RMB 648.66",
     "cancelPolicy": "免费取消：卑尔根时间 2026-09-23前",
     "note": "卑尔根短住，次日去机场。",
+    "images": [
+      "./assets/lodgings/citybox-danmarksplass-1.png"
+    ],
     "sortOrder": 30
   },
   {
@@ -98,6 +107,9 @@ export const lodgings: LodgingSummary[] = [
     "amount": "RMB 1,814.97",
     "cancelPolicy": "免费取消：雷克雅未克时间 2026-09-22前",
     "note": "雷市两晚缓冲，方便补给和半岛/温泉日。",
+    "images": [
+      "./assets/lodgings/b47-1.png"
+    ],
     "sortOrder": 40
   },
   {
@@ -126,6 +138,9 @@ export const lodgings: LodgingSummary[] = [
     "amount": "RMB 1,141.10",
     "cancelPolicy": "9月25日23:59前可免费取消",
     "note": "黄金圈后入住，第二天南岸早出发。",
+    "images": [
+      "./assets/lodgings/ugla-guesthouse-1.png"
+    ],
     "sortOrder": 50
   },
   {
@@ -154,6 +169,9 @@ export const lodgings: LodgingSummary[] = [
     "amount": "RMB 1,028.85",
     "cancelPolicy": "抵达日前72小时可免费取消",
     "note": "靠近 Hali 和冰川活动集合区域。",
+    "images": [
+      "./assets/lodgings/skyrhusid-1.png"
+    ],
     "sortOrder": 60
   },
   {
@@ -183,6 +201,9 @@ export const lodgings: LodgingSummary[] = [
     "amount": "RMB 1,089.81",
     "cancelPolicy": "9月25日23:59前可免费取消",
     "note": "冰河湖后在 Höfn 方向休息，次日长距离返程。",
+    "images": [
+      "./assets/lodgings/saudanes-guesthouse-1.png"
+    ],
     "sortOrder": 70
   },
   {
@@ -210,6 +231,9 @@ export const lodgings: LodgingSummary[] = [
     "amount": "RMB 1,122.46",
     "cancelPolicy": "不可退款",
     "note": "机场附近前夜住宿，方便早班机还车。",
+    "images": [
+      "./assets/lodgings/lighthouse-inn-1.png"
+    ],
     "sortOrder": 80
   }
 ];

@@ -55,6 +55,7 @@ export type LodgingSummary = {
   amount?: string;
   cancelPolicy?: string;
   note?: string;
+  images: string[];
   sortOrder: number;
 };
 
