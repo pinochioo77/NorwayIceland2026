@@ -39,6 +39,7 @@ type TripClockState = {
   days: number;
   hours: number;
   minutes: number;
+  seconds: number;
 };
 
 type DayVisual = {
@@ -50,6 +51,21 @@ const tripStart = new Date('2026-09-25T20:50:00+08:00');
 const tripEnd = new Date('2026-10-06T18:25:00+08:00');
 
 const weatherReviewLinks = [officialLinks.road, officialLinks.safetravel, officialLinks.vedur];
+
+const weatherPoints: Record<string, { label: string; latitude: number; longitude: number }> = {
+  '9/25': { label: 'Helsinki / Oslo', latitude: 60.1699, longitude: 24.9384 },
+  '9/26': { label: 'Oslo', latitude: 59.9139, longitude: 10.7522 },
+  '9/27': { label: 'Voss', latitude: 60.6287, longitude: 6.4147 },
+  '9/28': { label: 'Bergen', latitude: 60.3913, longitude: 5.3221 },
+  '9/29': { label: 'Reykjavik', latitude: 64.1466, longitude: -21.9426 },
+  '9/30': { label: 'Reykjanes', latitude: 63.9998, longitude: -22.5583 },
+  '10/1': { label: 'Hella', latitude: 63.8356, longitude: -20.4006 },
+  '10/2': { label: 'Vik / Hali', latitude: 63.4186, longitude: -19.006 },
+  '10/3': { label: 'Jokulsarlon / Hofn', latitude: 64.0477, longitude: -16.179 },
+  '10/4': { label: 'Keflavik / Gardur', latitude: 63.9998, longitude: -22.5583 },
+  '10/5': { label: 'Helsinki', latitude: 60.1699, longitude: 24.9384 },
+  '10/6': { label: 'Shanghai', latitude: 31.2304, longitude: 121.4737 },
+};
 
 const tabIcons: Record<Tab, ReactNode> = {
   每日行程: <Route aria-hidden />,
@@ -173,6 +189,7 @@ export function App() {
               <Metric icon={<CalendarDays />} label="日期" value="2026.09.25 - 10.06" />
               <Metric icon={<Navigation />} label="主线" value="Oslo · Bergen · South Iceland" />
               <Metric icon={<CircleDollarSign />} label="预算" value={totalCost} />
+              <WeatherWidget day={currentDay} />
             </div>
           </div>
         </section>
@@ -216,7 +233,7 @@ function useTripClock(): TripClockState {
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 60_000);
+    const timer = window.setInterval(() => setNow(new Date()), 1_000);
     return () => window.clearInterval(timer);
   }, []);
 
@@ -232,11 +249,13 @@ function useTripClock(): TripClockState {
 }
 
 function durationParts(ms: number) {
-  const totalMinutes = Math.max(0, Math.floor(ms / 60_000));
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const totalMinutes = Math.floor(totalSeconds / 60);
   const days = Math.floor(totalMinutes / 1440);
   const hours = Math.floor((totalMinutes % 1440) / 60);
   const minutes = totalMinutes % 60;
-  return { days, hours, minutes };
+  const seconds = totalSeconds % 60;
+  return { days, hours, minutes, seconds };
 }
 
 function TripCountdown({ clock }: { clock: TripClockState }) {
@@ -247,6 +266,7 @@ function TripCountdown({ clock }: { clock: TripClockState }) {
         <strong>{clock.days}</strong><span>天</span>
         <strong>{clock.hours}</strong><span>小时</span>
         <strong>{clock.minutes}</strong><span>分钟</span>
+        <strong>{clock.seconds}</strong><span>秒</span>
       </div>
       <p className="countdown-note">按北京时间 / 浏览器本地时间动态计算</p>
     </div>
@@ -263,6 +283,94 @@ function Metric({ icon, label, value }: MetricProps) {
       </span>
     </div>
   );
+}
+
+type WeatherState =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | {
+      status: 'ready';
+      temperature: number;
+      wind: number;
+      code: number;
+      high?: number;
+      low?: number;
+      precipitation?: number;
+      updatedAt: string;
+    };
+
+function WeatherWidget({ day }: { day: TripDay }) {
+  const point = weatherPoints[day.date] ?? weatherPoints['9/29'];
+  const [weather, setWeather] = useState<WeatherState>({ status: 'loading' });
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setWeather({ status: 'loading' });
+    const params = new URLSearchParams({
+      latitude: String(point.latitude),
+      longitude: String(point.longitude),
+      current: 'temperature_2m,weather_code,wind_speed_10m',
+      daily: 'temperature_2m_max,temperature_2m_min,precipitation_probability_max',
+      timezone: 'auto',
+      forecast_days: '3',
+    });
+
+    fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Weather ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        setWeather({
+          status: 'ready',
+          temperature: Math.round(data.current?.temperature_2m),
+          wind: Math.round(data.current?.wind_speed_10m),
+          code: Number(data.current?.weather_code ?? 0),
+          high: Math.round(data.daily?.temperature_2m_max?.[0]),
+          low: Math.round(data.daily?.temperature_2m_min?.[0]),
+          precipitation: Math.round(data.daily?.precipitation_probability_max?.[0]),
+          updatedAt: data.current?.time ?? '',
+        });
+      })
+      .catch((error: unknown) => {
+        if ((error as Error).name !== 'AbortError') {
+          setWeather({ status: 'error', message: '天气暂不可用' });
+        }
+      });
+
+    return () => controller.abort();
+  }, [point.latitude, point.longitude]);
+
+  return (
+    <div className="weather-card" aria-live="polite">
+      <span className="metric-icon"><CloudSun aria-hidden /></span>
+      <div className="weather-main">
+        <small>目的地天气 · {point.label}</small>
+        {weather.status === 'ready' ? (
+          <>
+            <strong>{weather.temperature}°C · {weatherCodeText(weather.code)}</strong>
+            <span>{weather.low}°/{weather.high}° · 风 {weather.wind} km/h · 降水 {weather.precipitation ?? 0}%</span>
+          </>
+        ) : (
+          <>
+            <strong>{weather.status === 'loading' ? '读取中' : weather.message}</strong>
+            <span>短期预报，出发前仍以官方天气为准</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function weatherCodeText(code: number) {
+  if (code === 0) return '晴';
+  if ([1, 2, 3].includes(code)) return '多云';
+  if ([45, 48].includes(code)) return '雾';
+  if ([51, 53, 55, 56, 57].includes(code)) return '毛毛雨';
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return '雨';
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return '雪';
+  if ([95, 96, 99].includes(code)) return '雷暴';
+  return '天气变化';
 }
 
 function DayDetail({ day }: { day: TripDay }) {
@@ -340,10 +448,10 @@ function DayDetail({ day }: { day: TripDay }) {
                     {item.optional && <span className="optional">可选</span>}
                   </div>
                 </div>
-                <p className="place"><MapPinned aria-hidden />{displayPlaceName(item.place, item.title)}</p>
+                <p className="place"><MapPinned aria-hidden />{compactPlaceLabel(displayPlaceName(item.place, item.title), item.title)}</p>
                 {item.transport && <p className="muted"><Car aria-hidden />{item.transport}</p>}
                 {item.note && <p className="note">{item.note}</p>}
-                {itemPlaces.length > 0 && <NodeTools places={itemPlaces} />}
+                {itemPlaces.length > 0 && <NodeTools places={itemPlaces} contextTitle={item.title} contextPlace={item.place} />}
                 {itemBookings.map((booking) => (
                   <BookingInline booking={booking} key={booking.id} />
                 ))}
@@ -485,22 +593,37 @@ function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
   );
 }
 
-function NodeTools({ places: placeInfos }: { places: PlaceInfo[] }) {
+function NodeTools({
+  places: placeInfos,
+  contextTitle,
+  contextPlace,
+}: {
+  places: PlaceInfo[];
+  contextTitle?: string;
+  contextPlace?: string;
+}) {
   return (
     <div className="node-tools">
-      {placeInfos.map((place) => (
-        <div className="node-tool" key={place.id}>
+      {placeInfos.map((place) => {
+        const title = displayPlaceName(place.place, place.title);
+        const hideRepeatedTitle = isRepeatedPlaceTitle(title, place.title, contextTitle, contextPlace);
+        const description = compactPlaceDescription(place.description, contextTitle, contextPlace);
+
+        return (
+          <div className={`node-tool ${hideRepeatedTitle ? 'is-compact' : ''}`} key={place.id}>
           {place.localImage && (
             <div className="node-image" aria-label={`${place.title} 图片`}>
               <img src={place.localImage} alt={`${displayPlaceName(place.place, place.title)} 参考图`} loading="lazy" />
             </div>
           )}
           <div className="node-tool-main">
-            <div className="node-tool-title">
-              <strong>{displayPlaceName(place.place, place.title)}</strong>
-              <small>{place.title}</small>
-            </div>
-            {place.description && <p className="node-description">{place.description}</p>}
+            {!hideRepeatedTitle && (
+              <div className="node-tool-title">
+                <strong>{title}</strong>
+                {normalizeForCompare(place.title) !== normalizeForCompare(title) && <small>{place.title}</small>}
+              </div>
+            )}
+            {description && <p className="node-description">{description}</p>}
             <div className="node-link-row">
               {place.mapUrl && <TinyLink href={place.mapUrl} label="地图" icon={<MapPinned aria-hidden />} />}
               {place.parkingUrl && <TinyLink href={place.parkingUrl} label="停车" icon={<ParkingCircle aria-hidden />} />}
@@ -508,16 +631,44 @@ function NodeTools({ places: placeInfos }: { places: PlaceInfo[] }) {
             </div>
             {place.parkingNote && <p className="parking-note">{place.parkingNote}</p>}
           </div>
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
+}
+
+function isRepeatedPlaceTitle(title: string, rawTitle: string, contextTitle?: string, contextPlace?: string) {
+  const candidates = [title, rawTitle].map(normalizeForCompare).filter((value) => value.length >= 4);
+  const contexts = [contextTitle, contextPlace].map(normalizeForCompare).filter((value) => value.length >= 4);
+  return candidates.some((candidate) => contexts.some((context) => context.includes(candidate) || candidate.includes(context)));
+}
+
+function compactPlaceDescription(description?: string, contextTitle?: string, contextPlace?: string) {
+  if (!description) return '';
+  const normalizedDescription = normalizeForCompare(description);
+  const repeatedContext = [contextTitle, contextPlace]
+    .map(normalizeForCompare)
+    .some((context) => context.length >= 6 && (normalizedDescription.includes(context) || context.includes(normalizedDescription)));
+  return repeatedContext ? '' : description;
+}
+
+function normalizeForCompare(value?: string) {
+  return (value ?? '')
+    .toLowerCase()
+    .replace(/[\s,.;:：，。；、·/\\|()（）[\]【】"'’‘“”\-+→]+/g, '');
 }
 
 function displayPlaceName(raw: string, title?: string): string {
   if (!raw) return title ?? '';
   const segments = raw.split('→').map((segment) => displayPlaceSegment(segment.trim(), title));
   return segments.join(' → ');
+}
+
+function compactPlaceLabel(label: string, title?: string) {
+  if (!title) return label;
+  const prefixes = [`${title} · `, `${title} 路 `, `${title}: `, `${title}：`];
+  return prefixes.reduce((current, prefix) => (current.startsWith(prefix) ? current.slice(prefix.length) : current), label);
 }
 
 function displayPlaceSegment(raw: string, title?: string): string {
@@ -731,7 +882,9 @@ function EmergencyPanel() {
             <div className="emergency-card" key={contact.name}>
               <span>{contact.country}</span>
               <strong>{contact.name}</strong>
-              <p>{contact.detail}</p>
+              <div className="emergency-lines">
+                {splitContactDetail(contact.detail).map((line) => <p key={line}>{line}</p>)}
+              </div>
             </div>
           ))}
         </div>
@@ -750,6 +903,10 @@ function EmergencyPanel() {
       </PanelTitle>
     </main>
   );
+}
+
+function splitContactDetail(detail: string) {
+  return detail.split(/[;；]/).map((part) => part.trim()).filter(Boolean);
 }
 
 function PanelTitle({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {

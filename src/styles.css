@@ -242,6 +242,7 @@ svg {
 .day-nav,
 .timeline-card,
 .quick-fact,
+.weather-card,
 .panel-card,
 .resource-card,
 .contact-card,
@@ -347,12 +348,12 @@ svg {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 8px;
+  gap: 7px 9px;
   font-weight: 900;
 }
 
 .countdown-value strong {
-  font-size: clamp(2.5rem, 6vw, 4.3rem);
+  font-size: clamp(2.25rem, 4.8vw, 3.75rem);
   line-height: 0.95;
 }
 
@@ -383,6 +384,47 @@ svg {
   border: 1px solid var(--line);
   border-radius: 24px;
   background: #fff;
+}
+
+.weather-card {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 126px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fff;
+}
+
+.weather-main {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.weather-main small {
+  display: block;
+  color: var(--muted);
+  font-size: var(--text-meta);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.weather-main strong {
+  display: block;
+  color: var(--ink);
+  font-size: var(--text-card);
+  font-weight: 850;
+  line-height: 1.28;
+  overflow-wrap: anywhere;
+}
+
+.weather-main span {
+  color: var(--muted);
+  font-size: var(--text-meta);
+  line-height: 1.35;
 }
 
 .metric-icon {
@@ -1020,6 +1062,14 @@ svg {
   grid-template-columns: 1fr;
 }
 
+.node-tool.is-compact {
+  grid-template-columns: 1fr;
+}
+
+.node-tool.is-compact .node-link-row {
+  margin-top: 4px;
+}
+
 .node-image,
 .lodging-gallery img {
   width: 100%;
@@ -1428,7 +1478,7 @@ svg {
 .cost-list,
 .emergency-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 12px;
 }
 
@@ -1436,10 +1486,24 @@ svg {
 .emergency-card {
   display: grid;
   gap: 4px;
+  align-content: start;
   padding: 14px;
   border: 1px solid rgba(121, 170, 189, 0.2);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.94);
+}
+
+.emergency-lines {
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.emergency-lines p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-body);
+  line-height: 1.45;
 }
 
 .focus-panel .cost-list div,
@@ -1794,6 +1858,7 @@ svg {
   }
 
   .metric,
+  .weather-card,
   .quick-fact,
   .resource-card,
   .contact-card,
