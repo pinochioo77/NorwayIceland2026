@@ -34,6 +34,30 @@ export type PlaceInfo = {
   sortOrder: number;
 };
 
+export type LodgingSummary = {
+  id: string;
+  date: string;
+  attachTime: string;
+  name: string;
+  city: string;
+  checkIn: string;
+  checkOut: string;
+  nights: number;
+  checkInTime?: string;
+  checkOutTime?: string;
+  room?: string;
+  area?: string;
+  bed?: string;
+  facilities: string[];
+  address?: string;
+  phone?: string;
+  platform?: string;
+  amount?: string;
+  cancelPolicy?: string;
+  note?: string;
+  sortOrder: number;
+};
+
 export type TripDay = {
   date: string;
   area: string;
@@ -56,6 +80,19 @@ export type ChecklistItem = {
   label: string;
   group: string;
   detail?: string;
+};
+
+export type MapStop = {
+  date: string;
+  label: string;
+  detail: string;
+  fuelUrl: string;
+  marketUrl: string;
+};
+
+export type DecisionRule = {
+  condition: string;
+  action: string;
 };
 
 export type BookingKind = '交通' | '住宿' | '活动' | '租车';
