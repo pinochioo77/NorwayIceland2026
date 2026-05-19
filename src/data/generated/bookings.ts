@@ -153,25 +153,6 @@ export const bookings: BookingSummary[] = [
     "sortOrder": 30
   },
   {
-    "id": "skyrhusid",
-    "date": "10/2",
-    "attachTime": "20:15 后",
-    "kind": "住宿",
-    "title": "Skyrhúsið Guesthouse",
-    "vendor": "Skyrhúsið Guesthouse",
-    "location": "Hali 附近",
-    "displayTime": "10/2 入住 / 10/3 退房",
-    "amount": "ISK 18,609.29 / 1 night",
-    "status": "已确认",
-    "facts": [
-      "小双床房，共用浴室",
-      "2 adults",
-      "靠近 Glacier Adventure 集合区域"
-    ],
-    "reminder": "10/2 必须从 Vík 继续开到 Hali 附近，不能把 Vík 当作当天终点。",
-    "sortOrder": 40
-  },
-  {
     "id": "blue-ice-cave",
     "date": "10/3",
     "attachTime": "09:30-15:30",

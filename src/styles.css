@@ -592,7 +592,7 @@ h4 {
 
 .booking-inline summary {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
   cursor: pointer;
@@ -626,16 +626,6 @@ h4 {
 .booking-kind {
   color: #fff;
   background: #144f55;
-}
-
-.booking-status {
-  color: #31513a;
-  background: #dcebd8;
-}
-
-.muted-status {
-  color: #5b625d;
-  background: #e8ece5;
 }
 
 .booking-summary-main {
@@ -786,7 +776,8 @@ h4 {
 
 .driving-grid,
 .check-grid,
-.emergency-list {
+.emergency-list,
+.map-stop-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
@@ -804,10 +795,70 @@ h4 {
   padding: 14px;
 }
 
-.driving-note p {
+.driving-note p,
+.map-stop-card p {
   margin-bottom: 0;
   color: #545d58;
   line-height: 1.58;
+}
+
+.map-stop-card {
+  padding: 12px;
+  border: 1px solid #d9ded4;
+  border-radius: 8px;
+  background: #f9faf5;
+}
+
+.map-stop-card strong {
+  display: block;
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
+
+.map-stop-card .node-link-row {
+  margin-top: 10px;
+}
+
+.decision-table {
+  display: grid;
+  gap: 8px;
+}
+
+.decision-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.44fr) minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #d9ded4;
+  border-radius: 8px;
+  background: #f9faf5;
+}
+
+.decision-row.heading {
+  color: #fff;
+  font-weight: 800;
+  background: #144f55;
+}
+
+.decision-row span,
+.decision-row strong {
+  line-height: 1.5;
+}
+
+.check-groups {
+  display: grid;
+  gap: 12px;
+}
+
+.check-group {
+  padding: 12px;
+  border: 1px solid #e0e4dc;
+  border-radius: 8px;
+  background: #fbfcf7;
+}
+
+.check-group h4 {
+  margin: 0 0 10px;
 }
 
 .check-item {
@@ -819,6 +870,15 @@ h4 {
   border: 1px solid #d9ded4;
   border-radius: 8px;
   background: #f9faf5;
+}
+
+.check-item.checked {
+  color: #5d675f;
+  background: #eef2ea;
+}
+
+.check-item.checked strong {
+  text-decoration: line-through;
 }
 
 .check-item input {
@@ -862,7 +922,8 @@ h4 {
 @media (max-width: 1120px) {
   .driving-grid,
   .check-grid,
-  .emergency-list {
+  .emergency-list,
+  .map-stop-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -902,7 +963,9 @@ h4 {
   .content-grid,
   .driving-grid,
   .check-grid,
-  .emergency-list {
+  .emergency-list,
+  .map-stop-grid,
+  .decision-row {
     grid-template-columns: 1fr;
   }
 

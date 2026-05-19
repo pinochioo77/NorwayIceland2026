@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   AlertTriangle,
   CalendarDays,
@@ -18,15 +18,15 @@ import {
   Phone,
   ShieldAlert,
   Sparkles,
-  TicketCheck,
   Utensils,
 } from 'lucide-react';
-import { drivingNotes, emergencyContacts, packingList, todos } from './data/checklists';
+import { drivingNotes, emergencyContacts, fuelMarketStops, packingList, todos, weatherDecisionRules } from './data/checklists';
 import { bookings } from './data/generated/bookings';
+import { lodgings } from './data/generated/lodgings';
 import { places } from './data/generated/places';
 import { officialLinks, preTripReviewLinks } from './data/links';
 import { totalCost, tripDays } from './data/trip';
-import type { BookingSummary, MetricProps, PlaceInfo, SourceLink, TripDay, TimelineItem } from './types';
+import type { BookingSummary, ChecklistItem, LodgingSummary, MetricProps, PlaceInfo, SourceLink, TripDay } from './types';
 
 const tabs = ['每日行程', '自驾与路况', '出发前清单', '费用与待办', '紧急联系'] as const;
 type Tab = (typeof tabs)[number];
@@ -112,6 +112,7 @@ function Metric({ icon, label, value }: MetricProps) {
 function DayDetail({ day }: { day: TripDay }) {
   const dayWarning = criticalDayWarnings[day.date];
   const dayBookings = bookings.filter((booking) => booking.date === day.date);
+  const dayLodgings = lodgings.filter((lodging) => lodging.date === day.date);
   const dayPlaces = places.filter((place) => place.date === day.date);
 
   return (
@@ -159,9 +160,8 @@ function DayDetail({ day }: { day: TripDay }) {
       <section className="timeline" aria-label="当天时间轴">
         {day.timeline.map((item, index) => {
           const itemBookings = dayBookings.filter((booking) => booking.attachTime === item.time);
+          const itemLodgings = dayLodgings.filter((lodging) => lodging.attachTime === item.time);
           const itemPlaces = dayPlaces.filter((place) => place.attachTime === item.time);
-          const hasStayBooking = itemBookings.some((booking) => booking.kind === '住宿');
-          const showStaySlot = isStayNode(item) && !hasStayBooking;
 
           return (
             <div className="timeline-row" key={`${item.time}-${item.title}`}>
@@ -173,7 +173,6 @@ function DayDetail({ day }: { day: TripDay }) {
                 <div className="timeline-title">
                   <h3>{item.title}</h3>
                   <div className="item-flags">
-                    {itemBookings.length > 0 && <span className="booked"><TicketCheck aria-hidden />已预订</span>}
                     {item.required && <span className="required">必做</span>}
                     {item.optional && <span className="optional">可选</span>}
                   </div>
@@ -185,7 +184,9 @@ function DayDetail({ day }: { day: TripDay }) {
                 {itemBookings.map((booking) => (
                   <BookingInline booking={booking} key={booking.id} />
                 ))}
-                {showStaySlot && <StayBookingSlot stay={day.stay} />}
+                {itemLodgings.map((lodging) => (
+                  <LodgingInline lodging={lodging} key={lodging.id} />
+                ))}
               </div>
             </div>
           );
@@ -208,14 +209,10 @@ function DayDetail({ day }: { day: TripDay }) {
   );
 }
 
-function isStayNode(item: TimelineItem) {
-  return /入住|住宿|酒店|Guesthouse|Scandic|B47|Citybox|Lighthouse/i.test(`${item.title} ${item.place}`);
-}
-
 const criticalDayWarnings: Record<string, { title: string; message: string }> = {
   '10/2': {
     title: '南岸长距离日',
-    message: '17:30 不是当天结束，Vík 补给后还要继续开到 Hali / Skyrhúsið，才能赶上 10/3 上午 09:30 冰川活动集合。',
+    message: '17:30 后不再补景点，按住宿方向收口并避免疲劳驾驶。',
   },
   '10/3': {
     title: '冰川活动集合',
@@ -246,7 +243,6 @@ function BookingInline({ booking }: { booking: BookingSummary }) {
           <strong>{booking.title}</strong>
           <small>{booking.vendor} · {booking.displayTime}</small>
         </span>
-        <span className="booking-status">{booking.status}</span>
         <ChevronDown aria-hidden />
       </summary>
       <div className="booking-body">
@@ -269,20 +265,35 @@ function BookingInline({ booking }: { booking: BookingSummary }) {
   );
 }
 
-function StayBookingSlot({ stay }: { stay: string }) {
+function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
   return (
-    <details className="booking-inline stay-slot">
+    <details className="booking-inline lodging-inline">
       <summary>
         <span className="booking-kind">住宿</span>
         <span className="booking-summary-main">
-          <strong>住宿预订窗口</strong>
-          <small>{stay}</small>
+          <strong>{lodging.name}</strong>
+          <small>{lodging.city} · {lodging.checkInTime || '入住时间见详情'}</small>
         </span>
-        <span className="booking-status muted-status">待整理</span>
         <ChevronDown aria-hidden />
       </summary>
       <div className="booking-body">
-        <p className="note">后续住宿票据整理后，先写入 Excel 的公开摘要，再自动同步到这里。</p>
+        <dl className="booking-facts">
+          <div><dt>入住 / 退房</dt><dd>{lodging.checkIn} {lodging.checkInTime || ''} → {lodging.checkOut} {lodging.checkOutTime || ''}</dd></div>
+          {lodging.address && <div><dt>地址</dt><dd>{lodging.address}</dd></div>}
+          {lodging.phone && <div><dt>电话</dt><dd>{lodging.phone}</dd></div>}
+          {lodging.room && <div><dt>房型</dt><dd>{lodging.room}</dd></div>}
+          {lodging.bed && <div><dt>床型</dt><dd>{lodging.bed}</dd></div>}
+          {lodging.area && <div><dt>面积</dt><dd>{lodging.area}</dd></div>}
+          {lodging.amount && <div><dt>金额</dt><dd>{lodging.amount}</dd></div>}
+          {lodging.platform && <div><dt>平台</dt><dd>{lodging.platform}</dd></div>}
+        </dl>
+        {lodging.facilities.length > 0 && (
+          <ul className="booking-list">
+            {lodging.facilities.map((facility, index) => <li key={`${facility}-${index}`}>{facility}</li>)}
+          </ul>
+        )}
+        {lodging.cancelPolicy && <p className="note">取消政策：{lodging.cancelPolicy}</p>}
+        {lodging.note && <p className="note">{lodging.note}</p>}
       </div>
     </details>
   );
@@ -331,13 +342,80 @@ function TinyLink({ href, label, icon }: { href: string; label: string; icon: Re
   );
 }
 
+function PersistentChecklist({ items, storageKey, grouped = false }: { items: ChecklistItem[]; storageKey: string; grouped?: boolean }) {
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => readStoredChecks(storageKey));
+
+  useEffect(() => {
+    window.localStorage.setItem(storageKey, JSON.stringify(checked));
+  }, [checked, storageKey]);
+
+  const toggle = (key: string) => {
+    setChecked((current) => ({ ...current, [key]: !current[key] }));
+  };
+
+  if (!grouped) {
+    return (
+      <div className="check-grid">
+        {items.map((item) => (
+          <CheckRow key={checkKey(item)} item={item} checked={Boolean(checked[checkKey(item)])} onToggle={() => toggle(checkKey(item))} />
+        ))}
+      </div>
+    );
+  }
+
+  const groups = items.reduce<Record<string, ChecklistItem[]>>((acc, item) => {
+    acc[item.group] = [...(acc[item.group] ?? []), item];
+    return acc;
+  }, {});
+
+  return (
+    <div className="check-groups">
+      {Object.entries(groups).map(([group, groupItems]) => (
+        <section className="check-group" key={group}>
+          <h4>{group}</h4>
+          <div className="check-grid">
+            {groupItems.map((item) => (
+              <CheckRow key={checkKey(item)} item={item} checked={Boolean(checked[checkKey(item)])} onToggle={() => toggle(checkKey(item))} hideGroup />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function CheckRow({ item, checked, onToggle, hideGroup = false }: { item: ChecklistItem; checked: boolean; onToggle: () => void; hideGroup?: boolean }) {
+  return (
+    <label className={`check-item ${checked ? 'checked' : ''}`}>
+      <input type="checkbox" checked={checked} onChange={onToggle} />
+      <span>
+        <strong>{item.label}</strong>
+        <small>{hideGroup ? item.detail : [item.group, item.detail].filter(Boolean).join(' · ')}</small>
+      </span>
+    </label>
+  );
+}
+
+function readStoredChecks(storageKey: string) {
+  if (typeof window === 'undefined') return {};
+  try {
+    return JSON.parse(window.localStorage.getItem(storageKey) ?? '{}') as Record<string, boolean>;
+  } catch {
+    return {};
+  }
+}
+
+function checkKey(item: ChecklistItem) {
+  return `${item.group}::${item.label}`;
+}
+
 function DrivingPanel() {
   return (
     <main className="content-grid">
       <section className="panel wide">
         <h2><Car aria-hidden /> 自驾与路况</h2>
         <p className="section-copy">
-          冰岛段以天气和路况为最高优先级。10/2 必须到 Hali，10/4 是最长驾驶日，所有补漏景点都让位给安全返程。
+          冰岛段以天气和路况为最高优先级。长距离日先保证住宿和航班衔接，所有补漏景点都让位给安全返程。
         </p>
         <div className="driving-grid">
           {drivingNotes.map((note) => (
@@ -348,18 +426,38 @@ function DrivingPanel() {
           ))}
         </div>
       </section>
+      <PanelTitle icon={<ShieldAlert />} title="天气 / 路况决策规则">
+        <div className="decision-table" role="table" aria-label="天气路况决策规则">
+          <div className="decision-row heading" role="row">
+            <span role="columnheader">情况</span>
+            <span role="columnheader">处理</span>
+          </div>
+          {weatherDecisionRules.map((rule) => (
+            <div className="decision-row" role="row" key={rule.condition}>
+              <span role="cell">{rule.condition}</span>
+              <strong role="cell">{rule.action}</strong>
+            </div>
+          ))}
+        </div>
+      </PanelTitle>
+      <PanelTitle icon={<Fuel />} title="加油 / 超市地图">
+        <div className="map-stop-grid">
+          {fuelMarketStops.map((stop) => (
+            <div className="map-stop-card" key={`${stop.date}-${stop.label}`}>
+              <strong>{stop.date} · {stop.label}</strong>
+              <p>{stop.detail}</p>
+              <div className="node-link-row">
+                <TinyLink href={stop.fuelUrl} label="加油地图" icon={<Fuel aria-hidden />} />
+                <TinyLink href={stop.marketUrl} label="超市地图" icon={<MapPinned aria-hidden />} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </PanelTitle>
       <PanelTitle icon={<CloudSun />} title="出发前复查">
         <div className="link-grid">
           {[officialLinks.road, officialLinks.safetravel, officialLinks.vedur].map((link) => <LinkButton key={link.url} link={link} />)}
         </div>
-      </PanelTitle>
-      <PanelTitle icon={<Fuel />} title="关键加油点">
-        <ul className="clean-list">
-          <li>9/29：落地补给即可。</li>
-          <li>10/1：Selfoss，离开首都圈前加油。</li>
-          <li>10/2：Hella 满油出发，Vík 补给。</li>
-          <li>10/4：Vík / Hvolsvöllur 是返程关键补给点。</li>
-        </ul>
       </PanelTitle>
     </main>
   );
@@ -370,17 +468,7 @@ function ChecklistPanel() {
     <main className="content-grid">
       <section className="panel wide">
         <h2><Luggage aria-hidden /> 出发前清单</h2>
-        <div className="check-grid">
-          {packingList.map((item) => (
-            <label className="check-item" key={`${item.group}-${item.label}`}>
-              <input type="checkbox" />
-              <span>
-                <strong>{item.label}</strong>
-                <small>{item.group}{item.detail ? ` · ${item.detail}` : ''}</small>
-              </span>
-            </label>
-          ))}
-        </div>
+        <PersistentChecklist items={packingList} storageKey="norway-iceland-packing-v2" grouped />
       </section>
       <PanelTitle icon={<CheckCircle2 />} title="行前软件">
         <ul className="clean-list">
@@ -389,11 +477,10 @@ function ChecklistPanel() {
           <li>umferdin.is、Safetravel、Vedur 收藏到浏览器首页。</li>
         </ul>
       </PanelTitle>
-      <PanelTitle icon={<Sparkles />} title="特殊装备">
+      <PanelTitle icon={<Sparkles />} title="手机勾选">
         <ul className="clean-list">
-          <li>冰川活动：手套、防水外层、水、能量棒。</li>
-          <li>Sky Lagoon：泳衣、毛巾、拖鞋。</li>
-          <li>自驾：驾照翻译、信用卡、离线地图。</li>
+          <li>清单状态会保存在本机浏览器里，刷新页面后仍然保留。</li>
+          <li>换手机或清理浏览器数据后需要重新勾选。</li>
         </ul>
       </PanelTitle>
     </main>
@@ -429,17 +516,7 @@ function CostsPanel() {
       </section>
       <section className="panel wide">
         <h2><CheckCircle2 aria-hidden /> 待办</h2>
-        <div className="check-grid">
-          {todos.map((item) => (
-            <label className="check-item" key={item.label}>
-              <input type="checkbox" />
-              <span>
-                <strong>{item.label}</strong>
-                <small>{item.group}</small>
-              </span>
-            </label>
-          ))}
-        </div>
+        <PersistentChecklist items={todos} storageKey="norway-iceland-todos-v1" />
       </section>
     </main>
   );
