@@ -5,6 +5,7 @@ import {
   Car,
   ChevronDown,
   CheckCircle2,
+  ClipboardCheck,
   CircleDollarSign,
   CloudSun,
   ExternalLink,
@@ -16,9 +17,11 @@ import {
   Navigation,
   ParkingCircle,
   Phone,
+  Route,
   ShieldAlert,
   Sparkles,
   Utensils,
+  WalletCards,
 } from 'lucide-react';
 import { drivingNotes, emergencyContacts, fuelMarketStops, packingList, todos, weatherDecisionRules } from './data/checklists';
 import { bookings } from './data/generated/bookings';
@@ -31,68 +34,129 @@ import type { BookingSummary, ChecklistItem, LodgingSummary, MetricProps, PlaceI
 const tabs = ['每日行程', '自驾与路况', '出发前清单', '费用与待办', '紧急联系'] as const;
 type Tab = (typeof tabs)[number];
 
+const tabIcons: Record<Tab, ReactNode> = {
+  每日行程: <Route aria-hidden />,
+  自驾与路况: <Car aria-hidden />,
+  出发前清单: <ClipboardCheck aria-hidden />,
+  费用与待办: <WalletCards aria-hidden />,
+  紧急联系: <Phone aria-hidden />,
+};
+
 export function App() {
   const [activeDay, setActiveDay] = useState(tripDays[0].date);
   const [activeTab, setActiveTab] = useState<Tab>('每日行程');
   const currentDay = tripDays.find((day) => day.date === activeDay) ?? tripDays[0];
 
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <div>
-          <p className="eyebrow">Norway / Iceland / Helsinki</p>
-          <h1>挪威冰岛同行行程</h1>
-          <p className="intro">
-            9/25-10/6，从上海到奥斯陆、挪威峡湾、卑尔根、冰岛南岸，再经赫尔辛基返程。
-            这是给同行伙伴看的公开版，票据只保留脱敏摘要。
-          </p>
+    <div className="app-frame animal-cursor">
+      <aside className="island-sidebar" aria-label="旅行控制台">
+        <div className="sidebar-brand">
+          <span className="brand-leaf" aria-hidden />
+          <div>
+            <strong>Nordic Trip</strong>
+            <small>同行旅行手册</small>
+          </div>
         </div>
-        <div className="status-grid" aria-label="旅行总览">
-          <Metric icon={<CalendarDays />} label="日期" value="9/25 - 10/6" />
-          <Metric icon={<Navigation />} label="主线" value="Oslo → Bergen → Iceland" />
-          <Metric icon={<CircleDollarSign />} label="预算" value={totalCost} />
-          <Metric icon={<ShieldAlert />} label="重点风险" value="10/2-10/4 冰岛长线" />
-        </div>
-      </header>
 
-      <section className="review-strip" aria-label="出发前复查">
-        <div>
-          <p className="eyebrow">Pre-trip review</p>
-          <h2>出发前复查入口</h2>
-        </div>
-        <div className="review-links">
-          {preTripReviewLinks.map((link) => (
-            <LinkButton key={link.url} link={link} compact />
+        <nav className="tabbar" aria-label="页面栏目">
+          <p className="sidebar-label">Apps</p>
+          {tabs.map((tab) => (
+            <button key={tab} className={tab === activeTab ? 'active' : ''} onClick={() => setActiveTab(tab)}>
+              <span className="nav-icon">{tabIcons[tab]}</span>
+              <span>{tab}</span>
+            </button>
           ))}
+        </nav>
+
+        <div className="sidebar-section">
+          <p className="sidebar-label">Days</p>
+          <div className="day-nav" aria-label="日期导航">
+            {tripDays.map((day, index) => (
+              <button key={day.date} className={day.date === activeDay ? 'selected' : ''} onClick={() => {
+                setActiveDay(day.date);
+                setActiveTab('每日行程');
+              }}>
+                <span>{day.date}</span>
+                <small>{index + 1}. {day.area}</small>
+              </button>
+            ))}
+          </div>
         </div>
-      </section>
 
-      <nav className="tabbar" aria-label="页面栏目">
-        {tabs.map((tab) => (
-          <button key={tab} className={tab === activeTab ? 'active' : ''} onClick={() => setActiveTab(tab)}>
-            {tab}
-          </button>
-        ))}
-      </nav>
+        <div className="sidebar-note">
+          <small>Now viewing</small>
+          <strong>{activeTab === '每日行程' ? `${currentDay.date} · ${currentDay.area}` : activeTab}</strong>
+        </div>
+      </aside>
 
-      {activeTab === '每日行程' && (
-        <main className="trip-layout">
-          <aside className="day-nav" aria-label="日期导航">
+      <div className="mobile-topbar">
+        <div className="sidebar-brand">
+          <span className="brand-leaf" aria-hidden />
+          <div>
+            <strong>Nordic Trip</strong>
+            <small>{currentDay.date} · {currentDay.area}</small>
+          </div>
+        </div>
+      </div>
+
+      <main className="island-main">
+        <section className="topbar">
+          <div className="hero-sign">
+            <p className="eyebrow">Norway / Iceland / Helsinki</p>
+            <h1><span>挪威冰岛</span><span>同行行程</span></h1>
+            <p className="intro">
+              9/25-10/6，从上海到奥斯陆、挪威峡湾、卑尔根、冰岛南岸，再经赫尔辛基返程。
+              这是给同行伙伴看的公开版，票据只保留脱敏摘要。
+            </p>
+          </div>
+          <div className="status-grid" aria-label="旅行总览">
+            <Metric icon={<CalendarDays />} label="日期" value="9/25 - 10/6" />
+            <Metric icon={<Navigation />} label="主线" value="Oslo → Bergen → Iceland" />
+            <Metric icon={<CircleDollarSign />} label="预算" value={totalCost} />
+            <Metric icon={<ShieldAlert />} label="重点风险" value="10/2-10/4 冰岛长线" />
+          </div>
+        </section>
+
+        <section className="mobile-tabs" aria-label="页面栏目">
+          {tabs.map((tab) => (
+            <button key={tab} className={tab === activeTab ? 'active' : ''} onClick={() => setActiveTab(tab)}>
+              <span className="nav-icon">{tabIcons[tab]}</span>
+              <span>{tab}</span>
+            </button>
+          ))}
+        </section>
+
+        <section className="review-strip" aria-label="出发前复查">
+          <div>
+            <p className="eyebrow">Pre-trip review</p>
+            <h2>出发前复查入口</h2>
+          </div>
+          <div className="review-links">
+            {preTripReviewLinks.map((link) => (
+              <LinkButton key={link.url} link={link} compact />
+            ))}
+          </div>
+        </section>
+
+        {activeTab === '每日行程' && (
+          <>
+            <nav className="mobile-day-nav" aria-label="日期导航">
             {tripDays.map((day) => (
               <button key={day.date} className={day.date === activeDay ? 'selected' : ''} onClick={() => setActiveDay(day.date)}>
                 <span>{day.date}</span>
                 <small>{day.area}</small>
               </button>
             ))}
-          </aside>
-          <DayDetail day={currentDay} />
-        </main>
-      )}
+            </nav>
+            <DayDetail day={currentDay} />
+          </>
+        )}
 
-      {activeTab === '自驾与路况' && <DrivingPanel />}
-      {activeTab === '出发前清单' && <ChecklistPanel />}
-      {activeTab === '费用与待办' && <CostsPanel />}
-      {activeTab === '紧急联系' && <EmergencyPanel />}
+        {activeTab === '自驾与路况' && <DrivingPanel />}
+        {activeTab === '出发前清单' && <ChecklistPanel />}
+        {activeTab === '费用与待办' && <CostsPanel />}
+        {activeTab === '紧急联系' && <EmergencyPanel />}
+      </main>
     </div>
   );
 }
