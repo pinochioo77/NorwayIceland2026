@@ -1,12 +1,12 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   AlertTriangle,
   CalendarDays,
   Car,
-  ChevronDown,
   CheckCircle2,
-  ClipboardCheck,
+  ChevronDown,
   CircleDollarSign,
+  Clock3,
   CloudSun,
   ExternalLink,
   Fuel,
@@ -19,7 +19,6 @@ import {
   Phone,
   Route,
   ShieldAlert,
-  Sparkles,
   Utensils,
   WalletCards,
 } from 'lucide-react';
@@ -27,129 +26,181 @@ import { drivingNotes, emergencyContacts, fuelMarketStops, packingList, todos, w
 import { bookings } from './data/generated/bookings';
 import { lodgings } from './data/generated/lodgings';
 import { places } from './data/generated/places';
-import { officialLinks, preTripReviewLinks } from './data/links';
+import { officialLinks } from './data/links';
 import { totalCost, tripDays } from './data/trip';
 import type { BookingSummary, ChecklistItem, LodgingSummary, MetricProps, PlaceInfo, SourceLink, TripDay } from './types';
 
 const tabs = ['每日行程', '自驾与路况', '出发前清单', '费用与待办', '紧急联系'] as const;
 type Tab = (typeof tabs)[number];
 
+type TripClockState = {
+  phase: 'before' | 'during' | 'after';
+  label: string;
+  days: number;
+  hours: number;
+  minutes: number;
+};
+
+type DayVisual = {
+  src: string;
+  alt: string;
+};
+
+const tripStart = new Date('2026-09-25T20:50:00+08:00');
+const tripEnd = new Date('2026-10-06T18:25:00+08:00');
+
+const weatherReviewLinks = [officialLinks.road, officialLinks.safetravel, officialLinks.vedur];
+
 const tabIcons: Record<Tab, ReactNode> = {
   每日行程: <Route aria-hidden />,
   自驾与路况: <Car aria-hidden />,
-  出发前清单: <ClipboardCheck aria-hidden />,
+  出发前清单: <CheckCircle2 aria-hidden />,
   费用与待办: <WalletCards aria-hidden />,
   紧急联系: <Phone aria-hidden />,
 };
 
+const fallbackDayImages: Record<string, string[]> = {
+  '9/25': ['./assets/places/helsinki-cathedral.jpg'],
+  '9/27': ['./assets/places/aker-brygge.jpg'],
+  '9/29': ['./assets/places/seltun-reykjanes.jpg'],
+  '10/5': ['./assets/places/helsinki-cathedral.jpg'],
+  '10/6': ['./assets/places/helsinki-cathedral.jpg'],
+};
+
+const placeNameRules: Array<[string, string]> = [
+  ['Shanghai Pudong T2', '上海浦东 T2'],
+  ['Shanghai Pudong International Airport', '上海浦东机场'],
+  ['Helsinki-Vantaa', '赫尔辛基万塔机场'],
+  ['Helsinki Airport', '赫尔辛基机场'],
+  ['Helsinki city centre', '赫尔辛基市中心'],
+  ['Helsinki City Centre', '赫尔辛基市中心'],
+  ['Helsinki citywalk', '赫尔辛基城市步行'],
+  ['Helsinki Cathedral', '赫尔辛基大教堂 Helsinki Cathedral'],
+  ['Oslo Airport', '奥斯陆机场 Oslo Airport'],
+  ['Oslo Opera House', '奥斯陆歌剧院 Oslo Opera House'],
+  ['Karl Johans gate', '卡尔约翰大道 Karl Johans gate'],
+  ['The Royal Palace', '奥斯陆王宫 The Royal Palace'],
+  ['Aker Brygge', '阿克尔码头 Aker Brygge'],
+  ['Oslo S', '奥斯陆中央车站 Oslo S'],
+  ['Flåm', '弗洛姆 Flåm'],
+  ['Myrdal', '米达尔 Myrdal'],
+  ['Gudvangen', '居德旺恩 Gudvangen'],
+  ['Voss', '沃斯 Voss'],
+  ['Vangsvatnet', '旺斯湖 Vangsvatnet'],
+  ['Voss Gondol', '沃斯缆车 Voss Gondol'],
+  ['Hangurstoppen', '汉古尔山顶 Hangurstoppen'],
+  ['Bergen Airport', '卑尔根机场 Bergen Airport'],
+  ['Bergen', '卑尔根 Bergen'],
+  ['Bryggen', '布吕根 Bryggen'],
+  ['Mount Fløyen', '弗洛伊恩山 Mount Fløyen'],
+  ['Keflavik Airport', '凯夫拉维克机场 KEF'],
+  ['Keflavik', '凯夫拉维克 Keflavik'],
+  ['KEF', '凯夫拉维克机场 KEF'],
+  ['Reykjavik', '雷克雅未克 Reykjavik'],
+  ['Hallgrimskirkja', '哈尔格林姆教堂 Hallgrimskirkja'],
+  ['Reykjanes Peninsula', '雷克雅内斯半岛 Reykjanes Peninsula'],
+  ['Seltún', '塞尔屯地热区 Seltún'],
+  ['Gunnuhver', '贡努凯尔地热区 Gunnuhver'],
+  ['Reykjanesviti', '雷克雅内斯灯塔 Reykjanesviti'],
+  ['Sky Lagoon', '天空温泉 Sky Lagoon'],
+  ['Thingvellir National Park', '辛格维利尔国家公园 Thingvellir'],
+  ['Thingvellir', '辛格维利尔 Thingvellir'],
+  ['Geysir Geothermal Area', '盖锡尔地热区 Geysir'],
+  ['Geysir', '盖锡尔 Geysir'],
+  ['Gullfoss Waterfall', '黄金瀑布 Gullfoss'],
+  ['Gullfoss', '黄金瀑布 Gullfoss'],
+  ['Kerid Crater', '凯瑞斯火山口湖 Kerið'],
+  ['Kerid', '凯瑞斯火山口湖 Kerið'],
+  ['Kerið', '凯瑞斯火山口湖 Kerið'],
+  ['Hella', '海拉 Hella'],
+  ['Seljalandsfoss', '塞里雅兰瀑布 Seljalandsfoss'],
+  ['Gljufrabui', '秘密瀑布 Gljúfrabúi'],
+  ['Skogafoss', '斯科加瀑布 Skógafoss'],
+  ['Kvernufoss', '克维努瀑布 Kvernufoss'],
+  ['Dyrholaey', '迪霍拉里海岬 Dyrhólaey'],
+  ['Reynisfjara Black Sand Beach', '雷尼斯黑沙滩 Reynisfjara'],
+  ['Reynisfjara', '雷尼斯黑沙滩 Reynisfjara'],
+  ['Vik', '维克 Vík'],
+  ['Hali', '哈利 Hali'],
+  ['Skyrhúsið Guesthouse', 'Skyrhúsið 旅馆'],
+  ['Glacier Adventure Base Camp', 'Glacier Adventure 集合基地'],
+  ['Vatnajökull Glacier', '瓦特纳冰川 Vatnajökull Glacier'],
+  ['Fjallsarlon', 'Fjallsárlón 冰河湖'],
+  ['Jökulsárlón Glacier Lagoon', '杰古沙龙冰河湖 Jökulsárlón'],
+  ['Jökulsárlón', '杰古沙龙冰河湖 Jökulsárlón'],
+  ['Diamond Beach', '钻石沙滩 Diamond Beach'],
+  ['Höfn', '赫本 Höfn'],
+  ['Fjaðrárgljúfur Canyon', '羽毛峡谷 Fjaðrárgljúfur'],
+  ['Fjaðrárgljúfur', '羽毛峡谷 Fjaðrárgljúfur'],
+  ['South Coast', '冰岛南岸 South Coast'],
+  ['Lighthouse-Inn', 'Lighthouse-Inn 机场住宿'],
+];
+
 export function App() {
   const [activeDay, setActiveDay] = useState(tripDays[0].date);
   const [activeTab, setActiveTab] = useState<Tab>('每日行程');
+  const tripClock = useTripClock();
   const currentDay = tripDays.find((day) => day.date === activeDay) ?? tripDays[0];
 
   return (
-    <div className="app-frame animal-cursor">
-      <aside className="island-sidebar" aria-label="旅行控制台">
-        <div className="sidebar-brand">
-          <span className="brand-leaf" aria-hidden />
-          <div>
-            <strong>Nordic Trip</strong>
-            <small>同行旅行手册</small>
-          </div>
-        </div>
-
-        <nav className="tabbar" aria-label="页面栏目">
-          <p className="sidebar-label">Apps</p>
+    <div className="app-shell">
+      <header className="site-header">
+        <a className="brand-lockup" href="#top" aria-label="Escape 66 North">
+          <span>Escape</span>
+          <strong>66°N</strong>
+        </a>
+        <nav className="top-nav" aria-label="页面栏目">
           {tabs.map((tab) => (
             <button key={tab} className={tab === activeTab ? 'active' : ''} onClick={() => setActiveTab(tab)}>
-              <span className="nav-icon">{tabIcons[tab]}</span>
+              {tabIcons[tab]}
               <span>{tab}</span>
             </button>
           ))}
         </nav>
+      </header>
 
-        <div className="sidebar-section">
-          <p className="sidebar-label">Days</p>
-          <div className="day-nav" aria-label="日期导航">
-            {tripDays.map((day, index) => (
-              <button key={day.date} className={day.date === activeDay ? 'selected' : ''} onClick={() => {
-                setActiveDay(day.date);
-                setActiveTab('每日行程');
-              }}>
-                <span>{day.date}</span>
-                <small>{index + 1}. {day.area}</small>
-              </button>
-            ))}
+      <main id="top">
+        <section className="home-hero" aria-label="旅行手册总览">
+          <div className="hero-copy">
+            <p className="eyebrow">Norway · Iceland · Helsinki</p>
+            <h1>Escape:66°N</h1>
+            <p className="hero-subtitle">挪威冰岛同行旅行手册</p>
           </div>
-        </div>
 
-        <div className="sidebar-note">
-          <small>Now viewing</small>
-          <strong>{activeTab === '每日行程' ? `${currentDay.date} · ${currentDay.area}` : activeTab}</strong>
-        </div>
-      </aside>
-
-      <div className="mobile-topbar">
-        <div className="sidebar-brand">
-          <span className="brand-leaf" aria-hidden />
-          <div>
-            <strong>Nordic Trip</strong>
-            <small>{currentDay.date} · {currentDay.area}</small>
-          </div>
-        </div>
-      </div>
-
-      <main className="island-main">
-        <section className="topbar">
-          <div className="hero-sign">
-            <p className="eyebrow">Norway / Iceland / Helsinki</p>
-            <h1><span>挪威冰岛</span><span>同行行程</span></h1>
-            <p className="intro">
-              9/25-10/6，从上海到奥斯陆、挪威峡湾、卑尔根、冰岛南岸，再经赫尔辛基返程。
-              这是给同行伙伴看的公开版，票据只保留脱敏摘要。
-            </p>
-          </div>
-          <div className="status-grid" aria-label="旅行总览">
-            <Metric icon={<CalendarDays />} label="日期" value="9/25 - 10/6" />
-            <Metric icon={<Navigation />} label="主线" value="Oslo → Bergen → Iceland" />
-            <Metric icon={<CircleDollarSign />} label="预算" value={totalCost} />
-            <Metric icon={<ShieldAlert />} label="重点风险" value="10/2-10/4 冰岛长线" />
+          <div className="hero-side">
+            <TripCountdown clock={tripClock} />
+            <div className="status-grid" aria-label="旅行总览">
+              <Metric icon={<CalendarDays />} label="日期" value="2026.09.25 - 10.06" />
+              <Metric icon={<Navigation />} label="主线" value="Oslo · Bergen · South Iceland" />
+              <Metric icon={<CircleDollarSign />} label="预算" value={totalCost} />
+            </div>
           </div>
         </section>
 
-        <section className="mobile-tabs" aria-label="页面栏目">
-          {tabs.map((tab) => (
-            <button key={tab} className={tab === activeTab ? 'active' : ''} onClick={() => setActiveTab(tab)}>
-              <span className="nav-icon">{tabIcons[tab]}</span>
-              <span>{tab}</span>
-            </button>
-          ))}
-        </section>
-
-        <section className="review-strip" aria-label="出发前复查">
+        <section className="review-strip" aria-label="天气路况复查">
           <div>
-            <p className="eyebrow">Pre-trip review</p>
-            <h2>出发前复查入口</h2>
+            <p className="eyebrow">Live checks</p>
+            <h2>天气 / 路况复查</h2>
           </div>
           <div className="review-links">
-            {preTripReviewLinks.map((link) => (
+            {weatherReviewLinks.map((link) => (
               <LinkButton key={link.url} link={link} compact />
             ))}
           </div>
         </section>
 
         {activeTab === '每日行程' && (
-          <>
-            <nav className="mobile-day-nav" aria-label="日期导航">
-            {tripDays.map((day) => (
-              <button key={day.date} className={day.date === activeDay ? 'selected' : ''} onClick={() => setActiveDay(day.date)}>
-                <span>{day.date}</span>
-                <small>{day.area}</small>
-              </button>
-            ))}
-            </nav>
+          <section className="itinerary-layout" aria-label="每日行程">
+            <aside className="day-nav" aria-label="日期导航">
+              {tripDays.map((day, index) => (
+                <button key={day.date} className={day.date === activeDay ? 'selected' : ''} onClick={() => setActiveDay(day.date)}>
+                  <span>{day.date}</span>
+                  <small>{String(index + 1).padStart(2, '0')} · {day.area}</small>
+                </button>
+              ))}
+            </aside>
             <DayDetail day={currentDay} />
-          </>
+          </section>
         )}
 
         {activeTab === '自驾与路况' && <DrivingPanel />}
@@ -157,6 +208,47 @@ export function App() {
         {activeTab === '费用与待办' && <CostsPanel />}
         {activeTab === '紧急联系' && <EmergencyPanel />}
       </main>
+    </div>
+  );
+}
+
+function useTripClock(): TripClockState {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  if (now < tripStart) {
+    return { phase: 'before', label: '距离出发', ...durationParts(tripStart.getTime() - now.getTime()) };
+  }
+
+  if (now <= tripEnd) {
+    return { phase: 'during', label: '已出发', ...durationParts(now.getTime() - tripStart.getTime()) };
+  }
+
+  return { phase: 'after', label: '已过去', ...durationParts(now.getTime() - tripEnd.getTime()) };
+}
+
+function durationParts(ms: number) {
+  const totalMinutes = Math.max(0, Math.floor(ms / 60_000));
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  return { days, hours, minutes };
+}
+
+function TripCountdown({ clock }: { clock: TripClockState }) {
+  return (
+    <div className={`countdown-card ${clock.phase}`}>
+      <span className="countdown-label">{clock.label}</span>
+      <div className="countdown-value">
+        <strong>{clock.days}</strong><span>天</span>
+        <strong>{clock.hours}</strong><span>小时</span>
+        <strong>{clock.minutes}</strong><span>分钟</span>
+      </div>
+      <p className="countdown-note">按北京时间 / 浏览器本地时间动态计算</p>
     </div>
   );
 }
@@ -178,12 +270,26 @@ function DayDetail({ day }: { day: TripDay }) {
   const dayBookings = bookings.filter((booking) => booking.date === day.date);
   const dayLodgings = lodgings.filter((lodging) => lodging.date === day.date);
   const dayPlaces = places.filter((place) => place.date === day.date);
+  const dayVisuals = useMemo(() => getDayVisuals(day, dayPlaces, dayLodgings), [day, dayPlaces, dayLodgings]);
+  const dayIndex = tripDays.findIndex((item) => item.date === day.date) + 1;
 
   return (
     <article className="day-detail">
-      <section className={`day-hero ${day.heroImage ? '' : 'no-image'}`}>
-        <div className="hero-copy">
-          <p className="eyebrow">{day.route}</p>
+      <section className="day-cover">
+        <div className="cover-carousel" aria-label={`${day.area} 图片轮播`}>
+          {dayVisuals.map((visual, index) => (
+            <figure className="cover-slide" key={`${visual.src}-${index}`}>
+              <img src={visual.src} alt={visual.alt} loading={index === 0 ? 'eager' : 'lazy'} />
+            </figure>
+          ))}
+        </div>
+        {dayVisuals.length > 1 && (
+          <div className="cover-dots" aria-hidden>
+            {dayVisuals.map((visual) => <span key={visual.src} />)}
+          </div>
+        )}
+        <div className="cover-content">
+          <p className="eyebrow">Day {String(dayIndex).padStart(2, '0')} · {day.route}</p>
           <h2>{day.date} · {day.area}</h2>
           <p>{day.summary}</p>
           <div className="tag-row">
@@ -192,16 +298,7 @@ function DayDetail({ day }: { day: TripDay }) {
             ))}
           </div>
         </div>
-        {day.heroImage && <img src={day.heroImage} alt={`${day.area} 行程图片`} />}
       </section>
-
-      {day.galleryImages && day.galleryImages.length > 1 && (
-        <section className="photo-strip" aria-label="Excel 行程图片">
-          {day.galleryImages.map((image, index) => (
-            <img src={image} alt={`${day.area} 参考图 ${index + 1}`} key={image} />
-          ))}
-        </section>
-      )}
 
       <section className="quick-facts" aria-label="当天摘要">
         <Fact icon={<Hotel />} label="住宿" value={day.stay} />
@@ -241,7 +338,7 @@ function DayDetail({ day }: { day: TripDay }) {
                     {item.optional && <span className="optional">可选</span>}
                   </div>
                 </div>
-                <p className="place"><MapPinned aria-hidden />{item.place}</p>
+                <p className="place"><MapPinned aria-hidden />{displayPlaceName(item.place, item.title)}</p>
                 {item.transport && <p className="muted"><Car aria-hidden />{item.transport}</p>}
                 {item.note && <p className="note">{item.note}</p>}
                 {itemPlaces.length > 0 && <NodeTools places={itemPlaces} />}
@@ -271,6 +368,22 @@ function DayDetail({ day }: { day: TripDay }) {
       </section>
     </article>
   );
+}
+
+function getDayVisuals(day: TripDay, dayPlaces: PlaceInfo[], dayLodgings: LodgingSummary[]): DayVisual[] {
+  const sources = [
+    day.heroImage,
+    ...(day.galleryImages ?? []),
+    ...dayPlaces.map((place) => place.localImage),
+    ...dayLodgings.flatMap((lodging) => lodging.images),
+    ...(fallbackDayImages[day.date] ?? []),
+    './assets/trip/excel-image1.jpeg',
+  ].filter(Boolean) as string[];
+
+  return Array.from(new Set(sources)).slice(0, 6).map((src, index) => ({
+    src,
+    alt: `${day.area} 行程图 ${index + 1}`,
+  }));
 }
 
 const criticalDayWarnings: Record<string, { title: string; message: string }> = {
@@ -312,7 +425,7 @@ function BookingInline({ booking }: { booking: BookingSummary }) {
       <div className="booking-body">
         <dl className="booking-facts">
           <div><dt>时间</dt><dd>{booking.displayTime}</dd></div>
-          <div><dt>地点</dt><dd>{booking.location}</dd></div>
+          <div><dt>地点</dt><dd>{displayPlaceName(booking.location, booking.title)}</dd></div>
           {booking.amount && <div><dt>金额</dt><dd>{booking.amount}</dd></div>}
         </dl>
         <ul className="booking-list">
@@ -336,7 +449,7 @@ function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
         <span className="booking-kind">住宿</span>
         <span className="booking-summary-main">
           <strong>{lodging.name}</strong>
-          <small>{lodging.city} · {lodging.checkInTime || '入住时间见详情'}</small>
+          <small>{displayPlaceName(lodging.city)} · {lodging.checkInTime || '入住时间见详情'}</small>
         </span>
         <ChevronDown aria-hidden />
       </summary>
@@ -377,31 +490,44 @@ function NodeTools({ places: placeInfos }: { places: PlaceInfo[] }) {
         <div className="node-tool" key={place.id}>
           {place.localImage && (
             <div className="node-image" aria-label={`${place.title} 图片`}>
-              <img src={place.localImage} alt={`${place.place} 参考图`} loading="lazy" />
+              <img src={place.localImage} alt={`${displayPlaceName(place.place, place.title)} 参考图`} loading="lazy" />
             </div>
           )}
           <div className="node-tool-main">
             <div className="node-tool-title">
-              <strong>{place.place}</strong>
+              <strong>{displayPlaceName(place.place, place.title)}</strong>
               <small>{place.title}</small>
             </div>
             {place.description && <p className="node-description">{place.description}</p>}
             <div className="node-link-row">
               {place.mapUrl && <TinyLink href={place.mapUrl} label="地图" icon={<MapPinned aria-hidden />} />}
               {place.parkingUrl && <TinyLink href={place.parkingUrl} label="停车" icon={<ParkingCircle aria-hidden />} />}
-              {place.introUrl && <TinyLink href={place.introUrl} label="来源" icon={<Info aria-hidden />} />}
+              {place.introUrl && <TinyLink href={place.introUrl} label="介绍" icon={<Info aria-hidden />} />}
             </div>
             {place.parkingNote && <p className="parking-note">{place.parkingNote}</p>}
-            {place.imageSourceUrl && place.localImage && (
-              <a className="image-credit" href={place.imageSourceUrl} target="_blank" rel="noreferrer">
-                图片来源 <ExternalLink aria-hidden />
-              </a>
-            )}
           </div>
         </div>
       ))}
     </div>
   );
+}
+
+function displayPlaceName(raw: string, title?: string): string {
+  if (!raw) return title ?? '';
+  const segments = raw.split('→').map((segment) => displayPlaceSegment(segment.trim(), title));
+  return segments.join(' → ');
+}
+
+function displayPlaceSegment(raw: string, title?: string): string {
+  const hit = placeNameRules.find(([key]) => raw.includes(key));
+  if (hit) return raw.replace(hit[0], hit[1]);
+  if (hasChinese(raw)) return raw;
+  if (title && hasChinese(title)) return `${title.replace(/^驾驶：|^游览：/, '')} · ${raw}`;
+  return raw;
+}
+
+function hasChinese(value: string) {
+  return /[\u4e00-\u9fff]/.test(value);
 }
 
 function TinyLink({ href, label, icon }: { href: string; label: string; icon: ReactNode }) {
@@ -527,7 +653,7 @@ function DrivingPanel() {
       </PanelTitle>
       <PanelTitle icon={<CloudSun />} title="出发前复查">
         <div className="link-grid">
-          {[officialLinks.road, officialLinks.safetravel, officialLinks.vedur].map((link) => <LinkButton key={link.url} link={link} />)}
+          {weatherReviewLinks.map((link) => <LinkButton key={link.url} link={link} />)}
         </div>
       </PanelTitle>
     </main>
@@ -548,7 +674,7 @@ function ChecklistPanel() {
           <li>umferdin.is、Safetravel、Vedur 收藏到浏览器首页。</li>
         </ul>
       </PanelTitle>
-      <PanelTitle icon={<Sparkles />} title="手机勾选">
+      <PanelTitle icon={<Clock3 />} title="手机勾选">
         <ul className="clean-list">
           <li>清单状态会保存在本机浏览器里，刷新页面后仍然保留。</li>
           <li>换手机或清理浏览器数据后需要重新勾选。</li>
