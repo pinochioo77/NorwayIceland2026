@@ -177,7 +177,7 @@ export function App() {
           </div>
         </section>
 
-        <section className="review-strip" aria-label="天气路况复查">
+        <section className="review-strip section-shell" aria-label="天气路况复查">
           <div>
             <p className="eyebrow">Live checks</p>
             <h2>天气 / 路况复查</h2>
@@ -190,7 +190,7 @@ export function App() {
         </section>
 
         {activeTab === '每日行程' && (
-          <section className="itinerary-layout" aria-label="每日行程">
+          <section className="itinerary-layout section-shell" aria-label="每日行程">
             <aside className="day-nav" aria-label="日期导航">
               {tripDays.map((day, index) => (
                 <button key={day.date} className={day.date === activeDay ? 'selected' : ''} onClick={() => setActiveDay(day.date)}>
@@ -610,8 +610,8 @@ function checkKey(item: ChecklistItem) {
 
 function DrivingPanel() {
   return (
-    <main className="content-grid">
-      <section className="panel wide">
+    <main className="content-grid section-shell">
+      <section className="panel wide focus-panel">
         <h2><Car aria-hidden /> 自驾与路况</h2>
         <p className="section-copy">
           冰岛段以天气和路况为最高优先级。长距离日先保证住宿和航班衔接，所有补漏景点都让位给安全返程。
@@ -664,7 +664,7 @@ function DrivingPanel() {
 
 function ChecklistPanel() {
   return (
-    <main className="content-grid">
+    <main className="content-grid section-shell">
       <section className="panel wide">
         <h2><Luggage aria-hidden /> 出发前清单</h2>
         <PersistentChecklist items={packingList} storageKey="norway-iceland-packing-v2" grouped />
@@ -701,8 +701,8 @@ function CostsPanel() {
   ];
 
   return (
-    <main className="content-grid">
-      <section className="panel">
+    <main className="content-grid section-shell">
+      <section className="panel focus-panel">
         <h2><CircleDollarSign aria-hidden /> 费用</h2>
         <div className="cost-list">
           {costs.map(([label, value]) => (
@@ -723,8 +723,8 @@ function CostsPanel() {
 
 function EmergencyPanel() {
   return (
-    <main className="content-grid">
-      <section className="panel wide">
+    <main className="content-grid section-shell">
+      <section className="panel wide focus-panel">
         <h2><Phone aria-hidden /> 紧急联系</h2>
         <div className="emergency-list">
           {emergencyContacts.map((contact) => (
@@ -754,7 +754,7 @@ function EmergencyPanel() {
 
 function PanelTitle({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
-    <section className="panel">
+    <section className="panel panel-title">
       <h3>{icon}{title}</h3>
       {children}
     </section>
