@@ -272,6 +272,8 @@ function DayDetail({ day }: { day: TripDay }) {
   const dayPlaces = places.filter((place) => place.date === day.date);
   const dayVisuals = useMemo(() => getDayVisuals(day, dayPlaces, dayLodgings), [day, dayPlaces, dayLodgings]);
   const dayIndex = tripDays.findIndex((item) => item.date === day.date) + 1;
+  const showDrive = Boolean(day.drive && !day.drive.includes('非自驾'));
+  const showFuel = Boolean(showDrive && day.fuel && !day.fuel.includes('按当天状态'));
 
   return (
     <article className="day-detail">
@@ -304,8 +306,8 @@ function DayDetail({ day }: { day: TripDay }) {
         <Fact icon={<Hotel />} label="住宿" value={day.stay} />
         <Fact icon={<Utensils />} label="吃饭" value={day.meal} />
         <Fact icon={<CircleDollarSign />} label="费用" value={day.cost ?? '未单列'} />
-        <Fact icon={<Car />} label="驾驶" value={day.drive ?? '非自驾主日'} />
-        <Fact icon={<Fuel />} label="加油" value={day.fuel ?? '按当天状态'} />
+        {showDrive && <Fact icon={<Car />} label="驾驶" value={day.drive as string} />}
+        {showFuel && <Fact icon={<Fuel />} label="加油" value={day.fuel as string} />}
       </section>
 
       {dayWarning && (
