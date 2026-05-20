@@ -55,13 +55,15 @@ const weatherReviewLinks = [officialLinks.road, officialLinks.safetravel, offici
 
 const dayCoverImages: Record<string, string[]> = {
   '9/25': ['./assets/places/pudong-airport-t2.jpg'],
-  '9/26': ['./assets/places/royal-palace-oslo.jpg'],
+  '9/26': ['./assets/trip/excel-image4.jpeg'],
   '9/27': ['./assets/places/flam-fjord.jpg'],
-  '9/28': ['./assets/places/bryggen.jpg'],
+  '9/28': ['./assets/places/bergen-overview.jpg'],
   '9/29': ['./assets/places/keflavik-airport.jpg'],
-  '10/2': ['./assets/places/seljalandsfoss.jpg'],
-  '10/3': ['./assets/places/jokulsarlon.jpg'],
-  '10/6': ['./assets/places/pudong-airport-t2.jpg'],
+  '9/30': ['./assets/places/reykjavik-city.jpg'],
+  '10/2': ['./assets/trip/excel-image18.jpeg'],
+  '10/3': ['./assets/trip/excel-image15.jpeg'],
+  '10/5': ['./assets/places/helsinki-esplanadi.jpg'],
+  '10/6': ['./assets/places/pudong-airport-t2-arrival.jpg'],
 };
 
 const weatherPoints: Record<string, { label: string; latitude: number; longitude: number }> = {
@@ -94,18 +96,14 @@ const fallbackDayImages: Record<string, string[]> = {
   '9/28': ['./assets/places/vangsvatnet-voss.jpg', './assets/places/bryggen.jpg', './assets/places/mount-fl-yen.jpg'],
   '9/29': ['./assets/places/seltun-reykjanes.jpg'],
   '10/5': ['./assets/places/helsinki-cathedral.jpg'],
-  '10/6': ['./assets/places/pudong-airport-t2.jpg'],
+  '10/6': ['./assets/places/pudong-airport-t2-arrival.jpg'],
 };
 
 const placeImageRules: Array<[string, string]> = [
   ['reynisfjara', './assets/places/reynisfjara-black-sand-beach.jpg'],
   ['black sand', './assets/places/reynisfjara-black-sand-beach.jpg'],
   ['diamond beach', './assets/places/diamond-beach.jpg'],
-  ['keflavik airport', './assets/places/keflavik-airport.jpg'],
-  ['keflavik / kef', './assets/places/keflavik-airport.jpg'],
-  ['bergen airport', './assets/places/keflavik-airport.jpg'],
-  ['pudong', './assets/places/pudong-airport-t2.jpg'],
-  ['shanghai', './assets/places/pudong-airport-t2.jpg'],
+  ['hallgrimskirkja', './assets/places/hallgrimskirkja.jpg'],
   ['oslo-opera-house', './assets/places/oslo-opera-house.jpg'],
   ['opera house', './assets/places/oslo-opera-house.jpg'],
   ['royal-palace-oslo', './assets/places/royal-palace-oslo.jpg'],
@@ -117,11 +115,16 @@ const placeImageRules: Array<[string, string]> = [
   ['naeroyfjord', './assets/places/naeroyfjord.jpg'],
   ['nærøyfjord', './assets/places/naeroyfjord.jpg'],
   ['gudvangen', './assets/places/naeroyfjord.jpg'],
+  ['flåm', './assets/places/flam-village.jpg'],
+  ['flam', './assets/places/flam-village.jpg'],
   ['flåm', './assets/places/flam-fjord.jpg'],
   ['flam', './assets/places/flam-fjord.jpg'],
-  ['voss-gondol', './assets/places/vangsvatnet-voss.jpg'],
+  ['voss-gondol', './assets/places/voss-gondol.jpg'],
+  ['voss gondol', './assets/places/voss-gondol.jpg'],
+  ['hangurstoppen', './assets/places/voss-gondol.jpg'],
   ['vangsvatnet', './assets/places/vangsvatnet-voss.jpg'],
-  ['voss', './assets/places/vangsvatnet-voss.jpg'],
+  ['helsinki citywalk', './assets/places/helsinki-cathedral.jpg'],
+  ['helsinki cathedral', './assets/places/helsinki-cathedral.jpg'],
 ];
 
 const placeNameRules: Array<[string, string]> = [
@@ -559,9 +562,16 @@ function getPlaceImageCandidates(place: PlaceInfo) {
   return Array.from(new Set([place.localImage, ...matches].filter(Boolean) as string[]));
 }
 
+function shouldShowPlaceImage(place: PlaceInfo) {
+  return !(place.id.includes('south-coast-iceland') && !place.localImage);
+}
+
 function buildPlaceImageAssignments(dayPlaces: PlaceInfo[], dayVisuals: DayVisual[]) {
   const used = new Set(dayVisuals.map((visual) => visual.src));
   return dayPlaces.reduce<Record<string, string>>((acc, place) => {
+    if (!shouldShowPlaceImage(place)) {
+      return acc;
+    }
     const image = getPlaceImageCandidates(place).find((candidate) => !used.has(candidate));
     if (image) {
       acc[place.id] = image;
