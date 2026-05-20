@@ -60,8 +60,10 @@ const dayCoverImages: Record<string, string[]> = {
   '9/28': ['./assets/places/bergen-overview.jpg'],
   '9/29': ['./assets/places/keflavik-airport.jpg'],
   '9/30': ['./assets/places/reykjavik-city.jpg'],
+  '10/1': ['./assets/places/golden-circle-road.jpg'],
   '10/2': ['./assets/trip/excel-image18.jpeg'],
   '10/3': ['./assets/trip/excel-image15.jpeg'],
+  '10/4': ['./assets/places/iceland-south-coast.jpg'],
   '10/5': ['./assets/places/helsinki-esplanadi.jpg'],
   '10/6': ['./assets/places/pudong-airport-t2-arrival.jpg'],
 };
