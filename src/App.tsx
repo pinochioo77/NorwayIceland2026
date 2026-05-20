@@ -53,6 +53,17 @@ const maskedCost = '*** RMB';
 
 const weatherReviewLinks = [officialLinks.road, officialLinks.safetravel, officialLinks.vedur];
 
+const dayCoverImages: Record<string, string[]> = {
+  '9/25': ['./assets/places/pudong-airport-t2.jpg'],
+  '9/26': ['./assets/places/royal-palace-oslo.jpg'],
+  '9/27': ['./assets/places/flam-fjord.jpg'],
+  '9/28': ['./assets/places/bryggen.jpg'],
+  '9/29': ['./assets/places/keflavik-airport.jpg'],
+  '10/2': ['./assets/places/seljalandsfoss.jpg'],
+  '10/3': ['./assets/places/jokulsarlon.jpg'],
+  '10/6': ['./assets/places/pudong-airport-t2.jpg'],
+};
+
 const weatherPoints: Record<string, { label: string; latitude: number; longitude: number }> = {
   '9/25': { label: 'Helsinki / Oslo', latitude: 60.1699, longitude: 24.9384 },
   '9/26': { label: 'Oslo', latitude: 59.9139, longitude: 10.7522 },
@@ -87,6 +98,12 @@ const fallbackDayImages: Record<string, string[]> = {
 };
 
 const placeImageRules: Array<[string, string]> = [
+  ['reynisfjara', './assets/places/reynisfjara-black-sand-beach.jpg'],
+  ['black sand', './assets/places/reynisfjara-black-sand-beach.jpg'],
+  ['diamond beach', './assets/places/diamond-beach.jpg'],
+  ['keflavik airport', './assets/places/keflavik-airport.jpg'],
+  ['keflavik / kef', './assets/places/keflavik-airport.jpg'],
+  ['bergen airport', './assets/places/keflavik-airport.jpg'],
   ['pudong', './assets/places/pudong-airport-t2.jpg'],
   ['shanghai', './assets/places/pudong-airport-t2.jpg'],
   ['oslo-opera-house', './assets/places/oslo-opera-house.jpg'],
@@ -186,7 +203,7 @@ export function App() {
     <div className="app-shell">
       <header className="site-header">
         <a className="brand-lockup" href="#top" aria-label="Escape 66 North">
-          <img className="brand-logo" src="./assets/brand/logo.png" alt="" aria-hidden />
+          <img className="brand-logo" src="./assets/brand/logo-small.png" alt="" aria-hidden />
           <span>Escape</span>
           <strong>66°N</strong>
         </a>
@@ -410,6 +427,7 @@ function DayDetail({ day }: { day: TripDay }) {
   const dayLodgings = lodgings.filter((lodging) => lodging.date === day.date);
   const dayPlaces = places.filter((place) => place.date === day.date);
   const dayVisuals = useMemo(() => getDayVisuals(day, dayPlaces, dayLodgings), [day, dayPlaces, dayLodgings]);
+  const placeImages = useMemo(() => buildPlaceImageAssignments(dayPlaces, dayVisuals), [dayPlaces, dayVisuals]);
   const dayIndex = tripDays.findIndex((item) => item.date === day.date) + 1;
   const showDrive = Boolean(day.drive && !day.drive.includes('非自驾'));
   const showFuel = Boolean(showDrive && day.fuel && !day.fuel.includes('按当天状态'));
@@ -482,7 +500,7 @@ function DayDetail({ day }: { day: TripDay }) {
                 <p className="place"><MapPinned aria-hidden />{compactPlaceLabel(displayPlaceName(item.place, item.title), item.title)}</p>
                 {item.transport && <p className="muted"><Car aria-hidden />{item.transport}</p>}
                 {item.note && <p className="note">{item.note}</p>}
-                {itemPlaces.length > 0 && <NodeTools places={itemPlaces} contextTitle={item.title} contextPlace={item.place} />}
+                {itemPlaces.length > 0 && <NodeTools places={itemPlaces} contextTitle={item.title} contextPlace={item.place} imageByPlaceId={placeImages} />}
                 {itemBookings.map((booking) => (
                   <BookingInline booking={booking} key={booking.id} />
                 ))}
@@ -512,7 +530,8 @@ function DayDetail({ day }: { day: TripDay }) {
 }
 
 function getDayVisuals(day: TripDay, dayPlaces: PlaceInfo[], dayLodgings: LodgingSummary[]): DayVisual[] {
-  const publicTripSources = [
+  const controlledCovers = dayCoverImages[day.date];
+  const publicTripSources = controlledCovers ?? [
     day.heroImage,
     ...(day.galleryImages ?? []),
     ...dayPlaces.map((place) => place.localImage ?? getPlaceImage(place)),
@@ -529,8 +548,27 @@ function getDayVisuals(day: TripDay, dayPlaces: PlaceInfo[], dayLodgings: Lodgin
 }
 
 function getPlaceImage(place: PlaceInfo) {
+  return getPlaceImageCandidates(place)[0];
+}
+
+function getPlaceImageCandidates(place: PlaceInfo) {
   const haystack = `${place.id} ${place.place} ${place.title}`.toLowerCase();
-  return placeImageRules.find(([keyword]) => haystack.includes(keyword.toLowerCase()))?.[1];
+  const matches = placeImageRules
+    .filter(([keyword]) => haystack.includes(keyword.toLowerCase()))
+    .map(([, image]) => image);
+  return Array.from(new Set([place.localImage, ...matches].filter(Boolean) as string[]));
+}
+
+function buildPlaceImageAssignments(dayPlaces: PlaceInfo[], dayVisuals: DayVisual[]) {
+  const used = new Set(dayVisuals.map((visual) => visual.src));
+  return dayPlaces.reduce<Record<string, string>>((acc, place) => {
+    const image = getPlaceImageCandidates(place).find((candidate) => !used.has(candidate));
+    if (image) {
+      acc[place.id] = image;
+      used.add(image);
+    }
+    return acc;
+  }, {});
 }
 
 const criticalDayWarnings: Record<string, { title: string; message: string }> = {
@@ -608,6 +646,7 @@ function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
             ))}
           </div>
         )}
+        <div className="lodging-info">
         <dl className="booking-facts lodging-facts">
           <div><dt>入住 / 退房</dt><dd>{lodging.checkIn} {lodging.checkInTime || ''} → {lodging.checkOut} {lodging.checkOutTime || ''}</dd></div>
           {lodging.address && <div><dt>地址</dt><dd>{lodging.address}</dd></div>}
@@ -625,6 +664,7 @@ function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
         )}
         {lodging.cancelPolicy && <p className="note">取消政策：{lodging.cancelPolicy}</p>}
         {lodging.note && <p className="note">{lodging.note}</p>}
+        </div>
       </div>
     </details>
   );
@@ -634,10 +674,12 @@ function NodeTools({
   places: placeInfos,
   contextTitle,
   contextPlace,
+  imageByPlaceId,
 }: {
   places: PlaceInfo[];
   contextTitle?: string;
   contextPlace?: string;
+  imageByPlaceId?: Record<string, string>;
 }) {
   return (
     <div className="node-tools">
@@ -645,7 +687,7 @@ function NodeTools({
         const title = displayPlaceName(place.place, place.title);
         const hideRepeatedTitle = isRepeatedPlaceTitle(title, place.title, contextTitle, contextPlace);
         const description = compactPlaceDescription(place.description, contextTitle, contextPlace);
-        const image = place.localImage ?? getPlaceImage(place);
+        const image = imageByPlaceId ? imageByPlaceId[place.id] : getPlaceImage(place);
 
         return (
           <div className={`node-tool ${hideRepeatedTitle ? 'is-compact' : ''}`} key={place.id}>

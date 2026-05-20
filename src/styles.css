@@ -1289,6 +1289,7 @@ svg {
 .lodging-gallery {
   display: grid;
   gap: 8px;
+  width: min(190px, 100%);
 }
 
 .lodging-gallery img {
@@ -1778,7 +1779,7 @@ svg {
 
 @media (max-width: 760px) {
   .app-shell {
-    padding: 12px;
+    padding: 8px;
   }
 
   .site-header {
@@ -1786,6 +1787,16 @@ svg {
     align-items: flex-start;
     flex-direction: column;
     border-radius: 24px;
+  }
+
+  .review-strip,
+  .itinerary-layout,
+  .content-grid {
+    padding: 12px;
+  }
+
+  .itinerary-layout {
+    gap: 12px;
   }
 
   .brand-lockup {
@@ -1797,8 +1808,8 @@ svg {
   }
 
   .top-nav button {
-    padding: 9px 11px;
-    font-size: 0.84rem;
+    padding: 8px 10px;
+    font-size: 0.8rem;
   }
 
   .home-hero,
@@ -1823,24 +1834,59 @@ svg {
   }
 
   .status-grid,
-  .quick-facts,
   .detail-grid,
   .lodging-grid {
     grid-template-columns: 1fr;
   }
 
+  .quick-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .fact {
+    min-height: 74px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .fact strong {
+    font-size: 0.98rem;
+  }
+
   .day-cover {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 11;
     min-height: 0;
     border-radius: 26px;
   }
 
   .cover-content {
-    padding: 22px;
+    gap: 10px;
+    padding: 16px;
   }
 
   .cover-content h2 {
-    font-size: clamp(2rem, 9vw, 3rem);
+    font-size: clamp(1.55rem, 7vw, 2.35rem);
+  }
+
+  .cover-content p {
+    font-size: 0.9rem;
+  }
+
+  .day-nav {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .day-nav button {
+    min-width: 126px;
+    padding: 9px 10px;
+    border-radius: 15px;
+  }
+
+  .day-nav span,
+  .day-nav small {
+    font-size: 0.74rem;
   }
 
   .timeline::before {
@@ -1870,7 +1916,16 @@ svg {
   }
 
   .timeline-card {
+    padding: 16px;
     border-radius: 22px;
+  }
+
+  .timeline-title {
+    gap: 8px;
+  }
+
+  .timeline-title h3 {
+    font-size: 1.05rem;
   }
 
   .timeline-heading {
@@ -1878,29 +1933,58 @@ svg {
   }
 
   .node-tool {
-    grid-template-columns: 1fr;
+    grid-template-columns: 118px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
   }
 
   .lodging-body {
     grid-template-columns: 1fr;
   }
 
+  .lodging-gallery {
+    grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+    width: 100%;
+  }
+
+  .lodging-gallery img {
+    max-height: 128px;
+  }
+
   .decision-row {
     grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .decision-row.heading {
+    display: none;
+  }
+
+  .decision-row span,
+  .decision-row strong {
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .decision-row strong {
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: #eef7f9;
   }
 
   .node-image {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
   }
 }
 
 @media (max-width: 430px) {
   body {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .app-shell {
-    padding: 10px;
+    padding: 6px;
   }
 
   .home-hero,
@@ -1929,5 +2013,19 @@ svg {
 
   .countdown-value strong {
     font-size: 2.35rem;
+  }
+
+  .node-tool {
+    grid-template-columns: 104px minmax(0, 1fr);
+  }
+
+  .node-tool-title strong {
+    font-size: 0.98rem;
+  }
+
+  .node-description,
+  .parking-note,
+  .timeline-card p {
+    font-size: 0.88rem;
   }
 }
