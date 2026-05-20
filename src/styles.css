@@ -168,7 +168,7 @@ svg {
 .brand-lockup {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   color: var(--ink);
   font-size: var(--text-meta);
   font-weight: 800;
@@ -176,6 +176,13 @@ svg {
   text-decoration: none;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.brand-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  object-fit: cover;
 }
 
 .top-nav {
@@ -1049,8 +1056,8 @@ svg {
 
 .node-tool {
   display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: 148px minmax(0, 1fr);
+  gap: 16px;
   align-items: stretch;
   padding: 12px;
   border: 1px solid var(--line);
@@ -1059,10 +1066,6 @@ svg {
 }
 
 .node-tool:not(:has(.node-image)) {
-  grid-template-columns: 1fr;
-}
-
-.node-tool.is-compact {
   grid-template-columns: 1fr;
 }
 
@@ -1080,7 +1083,8 @@ svg {
 }
 
 .node-image {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
+  align-self: start;
 }
 
 .node-image img {
@@ -1275,18 +1279,46 @@ svg {
   line-height: 1.45;
 }
 
+.lodging-body {
+  display: grid;
+  grid-template-columns: minmax(150px, 190px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
 .lodging-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .lodging-gallery img {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
   width: 100%;
   height: auto;
-  max-height: 360px;
+  max-height: 150px;
+  border-radius: 16px;
   object-fit: cover;
+}
+
+.lodging-info {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.lodging-facts {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.lodging-facts div:first-child,
+.lodging-facts div:nth-child(2) {
+  border-color: rgba(121, 170, 189, 0.26);
+  background: #eef7f9;
+}
+
+.lodging-facilities {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  padding-left: 1rem;
 }
 
 .booking-list,
@@ -1418,6 +1450,26 @@ svg {
   border: 1px solid rgba(121, 170, 189, 0.2);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.94);
+}
+
+.map-stop-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-content: stretch;
+  min-height: 212px;
+}
+
+.map-stop-card > strong {
+  min-height: 2.7em;
+}
+
+.map-stop-card > p {
+  align-self: start;
+}
+
+.map-stop-card .node-link-row {
+  align-self: end;
+  margin-top: 12px;
 }
 
 .focus-panel .driving-note,
@@ -1826,6 +1878,10 @@ svg {
   }
 
   .node-tool {
+    grid-template-columns: 1fr;
+  }
+
+  .lodging-body {
     grid-template-columns: 1fr;
   }
 

@@ -49,6 +49,7 @@ type DayVisual = {
 
 const tripStart = new Date('2026-09-25T20:50:00+08:00');
 const tripEnd = new Date('2026-10-06T18:25:00+08:00');
+const maskedCost = '*** RMB';
 
 const weatherReviewLinks = [officialLinks.road, officialLinks.safetravel, officialLinks.vedur];
 
@@ -76,12 +77,35 @@ const tabIcons: Record<Tab, ReactNode> = {
 };
 
 const fallbackDayImages: Record<string, string[]> = {
-  '9/25': ['./assets/places/helsinki-cathedral.jpg'],
-  '9/27': ['./assets/places/aker-brygge.jpg'],
+  '9/25': ['./assets/places/pudong-airport-t2.jpg'],
+  '9/26': ['./assets/places/oslo-opera-house.jpg', './assets/places/royal-palace-oslo.jpg', './assets/places/aker-brygge.jpg'],
+  '9/27': ['./assets/places/flam-railway.jpg', './assets/places/naeroyfjord.jpg', './assets/places/flam-fjord.jpg'],
+  '9/28': ['./assets/places/vangsvatnet-voss.jpg', './assets/places/bryggen.jpg', './assets/places/mount-fl-yen.jpg'],
   '9/29': ['./assets/places/seltun-reykjanes.jpg'],
   '10/5': ['./assets/places/helsinki-cathedral.jpg'],
-  '10/6': ['./assets/places/helsinki-cathedral.jpg'],
+  '10/6': ['./assets/places/pudong-airport-t2.jpg'],
 };
+
+const placeImageRules: Array<[string, string]> = [
+  ['pudong', './assets/places/pudong-airport-t2.jpg'],
+  ['shanghai', './assets/places/pudong-airport-t2.jpg'],
+  ['oslo-opera-house', './assets/places/oslo-opera-house.jpg'],
+  ['opera house', './assets/places/oslo-opera-house.jpg'],
+  ['royal-palace-oslo', './assets/places/royal-palace-oslo.jpg'],
+  ['royal palace', './assets/places/royal-palace-oslo.jpg'],
+  ['aker-brygge', './assets/places/aker-brygge.jpg'],
+  ['flam-railway', './assets/places/flam-railway.jpg'],
+  ['flåm railway', './assets/places/flam-railway.jpg'],
+  ['myrdal', './assets/places/flam-railway.jpg'],
+  ['naeroyfjord', './assets/places/naeroyfjord.jpg'],
+  ['nærøyfjord', './assets/places/naeroyfjord.jpg'],
+  ['gudvangen', './assets/places/naeroyfjord.jpg'],
+  ['flåm', './assets/places/flam-fjord.jpg'],
+  ['flam', './assets/places/flam-fjord.jpg'],
+  ['voss-gondol', './assets/places/vangsvatnet-voss.jpg'],
+  ['vangsvatnet', './assets/places/vangsvatnet-voss.jpg'],
+  ['voss', './assets/places/vangsvatnet-voss.jpg'],
+];
 
 const placeNameRules: Array<[string, string]> = [
   ['Shanghai Pudong T2', '上海浦东 T2'],
@@ -162,6 +186,7 @@ export function App() {
     <div className="app-shell">
       <header className="site-header">
         <a className="brand-lockup" href="#top" aria-label="Escape 66 North">
+          <img className="brand-logo" src="./assets/brand/logo.png" alt="" aria-hidden />
           <span>Escape</span>
           <strong>66°N</strong>
         </a>
@@ -188,7 +213,7 @@ export function App() {
             <div className="status-grid" aria-label="旅行总览">
               <Metric icon={<CalendarDays />} label="日期" value="2026.09.25 - 10.06" />
               <Metric icon={<Navigation />} label="主线" value="Oslo · Bergen · South Iceland" />
-              <Metric icon={<CircleDollarSign />} label="预算" value={totalCost} />
+              <Metric icon={<CircleDollarSign />} label="预算" value={maskMoney(totalCost)} />
               <WeatherWidget day={currentDay} />
             </div>
           </div>
@@ -256,6 +281,12 @@ function durationParts(ms: number) {
   const minutes = totalMinutes % 60;
   const seconds = totalSeconds % 60;
   return { days, hours, minutes, seconds };
+}
+
+function maskMoney(value?: string) {
+  if (!value) return maskedCost;
+  const masked = value.replace(/[0-9][0-9,]*(?:\.[0-9]+)?/g, '***');
+  return masked === value ? maskedCost : masked;
 }
 
 function TripCountdown({ clock }: { clock: TripClockState }) {
@@ -413,7 +444,7 @@ function DayDetail({ day }: { day: TripDay }) {
       <section className="quick-facts" aria-label="当天摘要">
         <Fact icon={<Hotel />} label="住宿" value={day.stay} />
         <Fact icon={<Utensils />} label="吃饭" value={day.meal} />
-        <Fact icon={<CircleDollarSign />} label="费用" value={day.cost ?? '未单列'} />
+        <Fact icon={<CircleDollarSign />} label="费用" value={maskMoney(day.cost)} />
         {showDrive && <Fact icon={<Car />} label="驾驶" value={day.drive as string} />}
         {showFuel && <Fact icon={<Fuel />} label="加油" value={day.fuel as string} />}
       </section>
@@ -481,19 +512,25 @@ function DayDetail({ day }: { day: TripDay }) {
 }
 
 function getDayVisuals(day: TripDay, dayPlaces: PlaceInfo[], dayLodgings: LodgingSummary[]): DayVisual[] {
-  const sources = [
+  const publicTripSources = [
     day.heroImage,
     ...(day.galleryImages ?? []),
-    ...dayPlaces.map((place) => place.localImage),
-    ...dayLodgings.flatMap((lodging) => lodging.images),
+    ...dayPlaces.map((place) => place.localImage ?? getPlaceImage(place)),
     ...(fallbackDayImages[day.date] ?? []),
     './assets/trip/excel-image1.jpeg',
   ].filter(Boolean) as string[];
+  const lodgingBackup = dayLodgings.flatMap((lodging) => lodging.images);
+  const sources = publicTripSources.length > 0 ? publicTripSources : lodgingBackup;
 
   return Array.from(new Set(sources)).slice(0, 6).map((src, index) => ({
     src,
     alt: `${day.area} 行程图 ${index + 1}`,
   }));
+}
+
+function getPlaceImage(place: PlaceInfo) {
+  const haystack = `${place.id} ${place.place} ${place.title}`.toLowerCase();
+  return placeImageRules.find(([keyword]) => haystack.includes(keyword.toLowerCase()))?.[1];
 }
 
 const criticalDayWarnings: Record<string, { title: string; message: string }> = {
@@ -536,12 +573,12 @@ function BookingInline({ booking }: { booking: BookingSummary }) {
         <dl className="booking-facts">
           <div><dt>时间</dt><dd>{booking.displayTime}</dd></div>
           <div><dt>地点</dt><dd>{displayPlaceName(booking.location, booking.title)}</dd></div>
-          {booking.amount && <div><dt>金额</dt><dd>{booking.amount}</dd></div>}
+          {booking.amount && <div><dt>金额</dt><dd>{maskMoney(booking.amount)}</dd></div>}
         </dl>
         <ul className="booking-list">
-          {booking.facts.map((fact) => <li key={fact}>{fact}</li>)}
+          {booking.facts.map((fact) => <li key={fact}>{maskMoney(fact)}</li>)}
         </ul>
-        {booking.reminder && <p className="note">{booking.reminder}</p>}
+        {booking.reminder && <p className="note">{maskMoney(booking.reminder)}</p>}
         {booking.links && (
           <div className="link-grid">
             {booking.links.map((link) => <LinkButton key={link.url} link={link} />)}
@@ -563,7 +600,7 @@ function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
         </span>
         <ChevronDown aria-hidden />
       </summary>
-      <div className="booking-body">
+      <div className="booking-body lodging-body">
         {lodging.images.length > 0 && (
           <div className="lodging-gallery" aria-label={`${lodging.name} 图片`}>
             {lodging.images.map((image) => (
@@ -571,18 +608,18 @@ function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
             ))}
           </div>
         )}
-        <dl className="booking-facts">
+        <dl className="booking-facts lodging-facts">
           <div><dt>入住 / 退房</dt><dd>{lodging.checkIn} {lodging.checkInTime || ''} → {lodging.checkOut} {lodging.checkOutTime || ''}</dd></div>
           {lodging.address && <div><dt>地址</dt><dd>{lodging.address}</dd></div>}
           {lodging.phone && <div><dt>电话</dt><dd>{lodging.phone}</dd></div>}
           {lodging.room && <div><dt>房型</dt><dd>{lodging.room}</dd></div>}
           {lodging.bed && <div><dt>床型</dt><dd>{lodging.bed}</dd></div>}
           {lodging.area && <div><dt>面积</dt><dd>{lodging.area}</dd></div>}
-          {lodging.amount && <div><dt>金额</dt><dd>{lodging.amount}</dd></div>}
+          {lodging.amount && <div><dt>金额</dt><dd>{maskMoney(lodging.amount)}</dd></div>}
           {lodging.platform && <div><dt>平台</dt><dd>{lodging.platform}</dd></div>}
         </dl>
         {lodging.facilities.length > 0 && (
-          <ul className="booking-list">
+          <ul className="booking-list lodging-facilities">
             {lodging.facilities.map((facility, index) => <li key={`${facility}-${index}`}>{facility}</li>)}
           </ul>
         )}
@@ -608,12 +645,13 @@ function NodeTools({
         const title = displayPlaceName(place.place, place.title);
         const hideRepeatedTitle = isRepeatedPlaceTitle(title, place.title, contextTitle, contextPlace);
         const description = compactPlaceDescription(place.description, contextTitle, contextPlace);
+        const image = place.localImage ?? getPlaceImage(place);
 
         return (
           <div className={`node-tool ${hideRepeatedTitle ? 'is-compact' : ''}`} key={place.id}>
-          {place.localImage && (
+          {image && (
             <div className="node-image" aria-label={`${place.title} 图片`}>
-              <img src={place.localImage} alt={`${displayPlaceName(place.place, place.title)} 参考图`} loading="lazy" />
+              <img src={image} alt={`${title} 参考图`} loading="lazy" />
             </div>
           )}
           <div className="node-tool-main">
@@ -859,7 +897,7 @@ function CostsPanel() {
           {costs.map(([label, value]) => (
             <div key={label}>
               <span>{label}</span>
-              <strong>{value}</strong>
+              <strong>{maskMoney(value)}</strong>
             </div>
           ))}
         </div>
