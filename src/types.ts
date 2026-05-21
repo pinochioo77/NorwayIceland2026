@@ -78,9 +78,35 @@ export type TripDay = {
 };
 
 export type ChecklistItem = {
+  id?: string;
   label: string;
   group: string;
   detail?: string;
+  priority?: string;
+  deadline?: string;
+  status?: string;
+  sortOrder?: number;
+};
+
+export type PreTripTodo = {
+  id: string;
+  title: string;
+  deadline?: string;
+  status?: string;
+  owner?: string;
+  note?: string;
+  sourceUrl?: string;
+  sortOrder: number;
+};
+
+export type PreTripRule = {
+  id: string;
+  category: string;
+  title: string;
+  rule: string;
+  action?: string;
+  sourceUrl?: string;
+  sortOrder: number;
 };
 
 export type MapStop = {

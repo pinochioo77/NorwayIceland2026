@@ -1701,6 +1701,169 @@ svg {
   color: var(--moss);
 }
 
+.pretrip-shell {
+  align-items: start;
+}
+
+.pretrip-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+}
+
+.pretrip-progress {
+  display: grid;
+  place-items: center;
+  min-width: 150px;
+  min-height: 112px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.pretrip-progress strong {
+  color: #fff;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.pretrip-progress span {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: var(--text-meta);
+  font-weight: 800;
+}
+
+.pretrip-todo-groups,
+.pretrip-rule-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.pretrip-todo-group,
+.pretrip-rule-group {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 16px;
+  border: 1px solid rgba(121, 170, 189, 0.2);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.pretrip-todo-group h4,
+.pretrip-rule-group h4 {
+  margin: 0;
+  color: var(--fjord);
+  font-size: var(--text-card);
+  font-weight: 850;
+}
+
+.pretrip-rule-list {
+  display: grid;
+  gap: 10px;
+}
+
+.pretrip-rule-card {
+  display: grid;
+  gap: 6px;
+  padding: 13px 14px;
+  border: 1px solid rgba(121, 170, 189, 0.18);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.pretrip-rule-card strong {
+  color: var(--ink);
+  font-size: var(--text-card);
+  line-height: 1.35;
+}
+
+.pretrip-rule-card p {
+  color: var(--muted);
+  font-size: var(--text-body);
+  line-height: 1.55;
+}
+
+.pretrip-rule-card small {
+  color: var(--fjord);
+  font-size: var(--text-meta);
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.daily-check-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+}
+
+.daily-check-note svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  color: var(--fjord);
+}
+
+.daily-check-note p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-body);
+  line-height: 1.55;
+}
+
+.daily-check-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(121, 170, 189, 0.18);
+}
+
+.reset-checks-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border: 1px solid rgba(121, 170, 189, 0.32);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--fjord);
+  font-size: var(--text-meta);
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(36, 52, 71, 0.08);
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.reset-checks-button svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+}
+
+.reset-checks-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(77, 128, 148, 0.46);
+  background: #fff;
+  box-shadow: 0 12px 24px rgba(36, 52, 71, 0.12);
+}
+
+.reset-checks-button:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(36, 52, 71, 0.08);
+}
+
 .todo-list,
 .fee-list,
 .source-list {
@@ -1842,6 +2005,29 @@ svg {
   .quick-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
+  }
+
+  .pretrip-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .pretrip-progress {
+    justify-self: stretch;
+    min-height: auto;
+  }
+
+  .pretrip-todo-groups,
+  .pretrip-rule-groups,
+  .check-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .daily-check-actions {
+    justify-content: stretch;
+  }
+
+  .reset-checks-button {
+    width: 100%;
   }
 
   .fact {

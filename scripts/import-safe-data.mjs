@@ -4,13 +4,19 @@ import XLSX from 'xlsx';
 
 const safeRoot = resolve('Data_Safe');
 const workbookPath = resolve(safeRoot, '北欧冰岛行程总表.xlsx');
+const publicSourceWorkbookPath = resolve(safeRoot, '网页公开真源.xlsx');
 const planPath = resolve(safeRoot, 'plan.md');
 const bookingSheetName = '票据公开摘要';
 const placeSheetName = '节点公开资料';
 const lodgingSheetName = '住宿公开摘要';
+const preTripChecklistSheetName = '出发前清单公开';
+const preTripTodoSheetName = '行前待办公开';
+const preTripRuleSheetName = '行前规则公开';
+const dailyCheckSheetName = '每日检查公开';
 const generatedBookingsPath = resolve('src/data/generated/bookings.ts');
 const generatedPlacesPath = resolve('src/data/generated/places.ts');
 const generatedLodgingsPath = resolve('src/data/generated/lodgings.ts');
+const generatedPreTripPath = resolve('src/data/generated/pretrip.ts');
 
 const commonPrivacyRules = [
   { name: 'email address', pattern: /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i },
@@ -36,11 +42,14 @@ const result = {
   safeRootPresent: true,
   planPresent: existsSync(planPath),
   workbookPresent: existsSync(workbookPath),
+  publicSourceWorkbookPresent: existsSync(publicSourceWorkbookPath),
   planCharacterCount: 0,
   sheets: [],
+  publicSourceSheets: [],
   generatedBookings: null,
   generatedPlaces: null,
   generatedLodgings: null,
+  generatedPreTrip: null,
   nextSteps: [
     'Review changed private source files locally.',
     'Copy only public-safe itinerary facts into src/data/trip.ts.',
@@ -101,6 +110,44 @@ if (result.workbookPresent) {
   result.generatedLodgings = {
     path: generatedLodgingsPath.replaceAll('\\', '/'),
     count: lodgings.length,
+  };
+}
+
+if (result.publicSourceWorkbookPresent) {
+  const publicWorkbook = XLSX.readFile(publicSourceWorkbookPath, { cellDates: true, bookFiles: false });
+  result.publicSourceSheets = publicWorkbook.SheetNames.map((name) => {
+    const range = XLSX.utils.decode_range(publicWorkbook.Sheets[name]['!ref'] ?? 'A1:A1');
+    return {
+      name,
+      rows: range.e.r - range.s.r + 1,
+      columns: range.e.c - range.s.c + 1,
+    };
+  });
+
+  for (const sheetName of [preTripChecklistSheetName, preTripTodoSheetName, preTripRuleSheetName, dailyCheckSheetName]) {
+    if (!publicWorkbook.SheetNames.includes(sheetName)) {
+      throw new Error(`Missing "${sheetName}" sheet in public source workbook.`);
+    }
+  }
+
+  const checklistRows = XLSX.utils.sheet_to_json(publicWorkbook.Sheets[preTripChecklistSheetName], { defval: '' });
+  const todoRows = XLSX.utils.sheet_to_json(publicWorkbook.Sheets[preTripTodoSheetName], { defval: '' });
+  const ruleRows = XLSX.utils.sheet_to_json(publicWorkbook.Sheets[preTripRuleSheetName], { defval: '' });
+  const dailyCheckRows = XLSX.utils.sheet_to_json(publicWorkbook.Sheets[dailyCheckSheetName], { defval: '' });
+  const preTrip = {
+    checklist: checklistRows.map((row) => normalizePreTripChecklistRow(row)),
+    todos: todoRows.map((row) => normalizePreTripTodoRow(row)),
+    rules: ruleRows.map((row) => normalizePreTripRuleRow(row)),
+    dailyChecks: dailyCheckRows.map((row) => normalizeDailyCheckRow(row)),
+  };
+  validatePreTrip(preTrip);
+  writeGeneratedPreTrip(preTrip);
+  result.generatedPreTrip = {
+    path: generatedPreTripPath.replaceAll('\\', '/'),
+    checklistCount: preTrip.checklist.length,
+    todoCount: preTrip.todos.length,
+    ruleCount: preTrip.rules.length,
+    dailyCheckCount: preTrip.dailyChecks.length,
   };
 }
 
@@ -175,6 +222,57 @@ function normalizeLodgingRow(row) {
     cancelPolicy: optional(row.cancel_policy),
     note: optional(row.note_public),
     images: splitList(row.local_images),
+    sortOrder: Number(row.sort_order || 0),
+  };
+}
+
+function normalizePreTripChecklistRow(row) {
+  return {
+    id: required(row.id, 'id'),
+    group: required(row.group, 'group'),
+    label: required(row.label, 'label'),
+    detail: optional(row.detail),
+    priority: optional(row.priority),
+    deadline: optional(row.deadline),
+    status: optional(row.status),
+    sortOrder: Number(row.sort_order || 0),
+  };
+}
+
+function normalizePreTripTodoRow(row) {
+  return {
+    id: required(row.id, 'id'),
+    title: required(row.title, 'title'),
+    deadline: optional(row.deadline),
+    status: optional(row.status),
+    owner: optional(row.owner),
+    note: optional(row.note_public),
+    sourceUrl: optional(row.source_url),
+    sortOrder: Number(row.sort_order || 0),
+  };
+}
+
+function normalizePreTripRuleRow(row) {
+  return {
+    id: required(row.id, 'id'),
+    category: required(row.category, 'category'),
+    title: required(row.title, 'title'),
+    rule: required(row.rule_public, 'rule_public'),
+    action: optional(row.action_public),
+    sourceUrl: optional(row.source_url),
+    sortOrder: Number(row.sort_order || 0),
+  };
+}
+
+function normalizeDailyCheckRow(row) {
+  return {
+    id: required(row.id, 'id'),
+    group: required(row.group, 'group'),
+    label: required(row.label, 'label'),
+    detail: optional(row.detail),
+    priority: optional(row.priority),
+    deadline: optional(row.timing || row.deadline),
+    status: optional(row.source),
     sortOrder: Number(row.sort_order || 0),
   };
 }
@@ -255,6 +353,28 @@ function validateLodgings(lodgings) {
   }
 }
 
+function validatePreTrip(preTrip) {
+  const serialized = JSON.stringify(preTrip);
+  for (const rule of bookingPrivacyRules) {
+    if (rule.pattern.test(serialized)) {
+      throw new Error(`Privacy check failed while importing pre-trip sheets: ${rule.name}`);
+    }
+  }
+
+  assertUniqueIds(preTrip.checklist, 'pre-trip checklist');
+  assertUniqueIds(preTrip.todos, 'pre-trip todo');
+  assertUniqueIds(preTrip.rules, 'pre-trip rule');
+  assertUniqueIds(preTrip.dailyChecks, 'daily check');
+}
+
+function assertUniqueIds(items, label) {
+  const ids = new Set();
+  for (const item of items) {
+    if (ids.has(item.id)) throw new Error(`Duplicate ${label} id: ${item.id}`);
+    ids.add(item.id);
+  }
+}
+
 function writeGeneratedBookings(bookings) {
   mkdirSync(resolve('src/data/generated'), { recursive: true });
   const sorted = [...bookings].sort((a, b) => a.sortOrder - b.sortOrder || a.id.localeCompare(b.id));
@@ -295,4 +415,27 @@ function writeGeneratedLodgings(lodgings) {
     '',
   ].join('\n');
   writeFileSync(generatedLodgingsPath, source, 'utf8');
+}
+
+function writeGeneratedPreTrip(preTrip) {
+  mkdirSync(resolve('src/data/generated'), { recursive: true });
+  const checklist = [...preTrip.checklist].sort((a, b) => a.sortOrder - b.sortOrder || a.id.localeCompare(b.id));
+  const todos = [...preTrip.todos].sort((a, b) => a.sortOrder - b.sortOrder || a.id.localeCompare(b.id));
+  const rules = [...preTrip.rules].sort((a, b) => a.sortOrder - b.sortOrder || a.id.localeCompare(b.id));
+  const dailyChecks = [...preTrip.dailyChecks].sort((a, b) => a.sortOrder - b.sortOrder || a.id.localeCompare(b.id));
+  const source = [
+    "import type { ChecklistItem, PreTripRule, PreTripTodo } from '../../types';",
+    '',
+    '// Generated by npm run import:data from the local public source workbook.',
+    '// Do not edit by hand; update the private source workbook instead.',
+    `export const preTripChecklist: ChecklistItem[] = ${JSON.stringify(checklist, null, 2)};`,
+    '',
+    `export const preTripTodos: PreTripTodo[] = ${JSON.stringify(todos, null, 2)};`,
+    '',
+    `export const preTripRules: PreTripRule[] = ${JSON.stringify(rules, null, 2)};`,
+    '',
+    `export const dailyChecks: ChecklistItem[] = ${JSON.stringify(dailyChecks, null, 2)};`,
+    '',
+  ].join('\n');
+  writeFileSync(generatedPreTripPath, source, 'utf8');
 }

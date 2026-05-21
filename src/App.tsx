@@ -22,15 +22,16 @@ import {
   Utensils,
   WalletCards,
 } from 'lucide-react';
-import { drivingNotes, emergencyContacts, fuelMarketStops, packingList, todos, weatherDecisionRules } from './data/checklists';
+import { drivingNotes, emergencyContacts, fuelMarketStops, weatherDecisionRules } from './data/checklists';
 import { bookings } from './data/generated/bookings';
 import { lodgings } from './data/generated/lodgings';
 import { places } from './data/generated/places';
+import { dailyChecks, preTripChecklist, preTripRules, preTripTodos } from './data/generated/pretrip';
 import { officialLinks } from './data/links';
 import { totalCost, tripDays } from './data/trip';
-import type { BookingSummary, ChecklistItem, LodgingSummary, MetricProps, PlaceInfo, SourceLink, TripDay } from './types';
+import type { BookingSummary, ChecklistItem, LodgingSummary, MetricProps, PlaceInfo, PreTripRule, PreTripTodo, SourceLink, TripDay } from './types';
 
-const tabs = ['每日行程', '自驾与路况', '出发前清单', '费用与待办', '紧急联系'] as const;
+const tabs = ['每日行程', '自驾与路况', '出发前准备', '每日检查', '费用', '紧急联系'] as const;
 type Tab = (typeof tabs)[number];
 
 type TripClockState = {
@@ -86,8 +87,9 @@ const weatherPoints: Record<string, { label: string; latitude: number; longitude
 const tabIcons: Record<Tab, ReactNode> = {
   每日行程: <Route aria-hidden />,
   自驾与路况: <Car aria-hidden />,
-  出发前清单: <CheckCircle2 aria-hidden />,
-  费用与待办: <WalletCards aria-hidden />,
+  出发前准备: <CheckCircle2 aria-hidden />,
+  每日检查: <Clock3 aria-hidden />,
+  费用: <WalletCards aria-hidden />,
   紧急联系: <Phone aria-hidden />,
 };
 
@@ -268,8 +270,9 @@ export function App() {
         )}
 
         {activeTab === '自驾与路况' && <DrivingPanel />}
-        {activeTab === '出发前清单' && <ChecklistPanel />}
-        {activeTab === '费用与待办' && <CostsPanel />}
+        {activeTab === '出发前准备' && <ChecklistPanel />}
+        {activeTab === '每日检查' && <DailyCheckPanel />}
+        {activeTab === '费用' && <CostsPanel />}
         {activeTab === '紧急联系' && <EmergencyPanel />}
       </main>
     </div>
@@ -784,23 +787,30 @@ function TinyLink({ href, label, icon }: { href: string; label: string; icon: Re
   );
 }
 
-function PersistentChecklist({ items, storageKey, grouped = false }: { items: ChecklistItem[]; storageKey: string; grouped?: boolean }) {
-  const [checked, setChecked] = useState<Record<string, boolean>>(() => readStoredChecks(storageKey));
-
-  useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify(checked));
-  }, [checked, storageKey]);
-
-  const toggle = (key: string) => {
-    setChecked((current) => ({ ...current, [key]: !current[key] }));
-  };
+function PersistentChecklist({
+  items,
+  storageKey,
+  grouped = false,
+  checkedState,
+  onToggleKey,
+}: {
+  items: ChecklistItem[];
+  storageKey: string;
+  grouped?: boolean;
+  checkedState?: Record<string, boolean>;
+  onToggleKey?: (key: string) => void;
+}) {
+  const stored = useStoredChecks(storageKey);
+  const checked = checkedState ?? stored.checked;
+  const toggle = onToggleKey ?? stored.toggle;
 
   if (!grouped) {
     return (
       <div className="check-grid">
-        {items.map((item) => (
-          <CheckRow key={checkKey(item)} item={item} checked={Boolean(checked[checkKey(item)])} onToggle={() => toggle(checkKey(item))} />
-        ))}
+        {items.map((item) => {
+          const key = checkKey(item);
+          return <CheckRow key={key} item={item} checked={Boolean(checked[key])} onToggle={() => toggle(key)} />;
+        })}
       </div>
     );
   }
@@ -816,9 +826,10 @@ function PersistentChecklist({ items, storageKey, grouped = false }: { items: Ch
         <section className="check-group" key={group}>
           <h4>{group}</h4>
           <div className="check-grid">
-            {groupItems.map((item) => (
-              <CheckRow key={checkKey(item)} item={item} checked={Boolean(checked[checkKey(item)])} onToggle={() => toggle(checkKey(item))} hideGroup />
-            ))}
+            {groupItems.map((item) => {
+              const key = checkKey(item);
+              return <CheckRow key={key} item={item} checked={Boolean(checked[key])} onToggle={() => toggle(key)} hideGroup />;
+            })}
           </div>
         </section>
       ))}
@@ -826,13 +837,35 @@ function PersistentChecklist({ items, storageKey, grouped = false }: { items: Ch
   );
 }
 
+function useStoredChecks(storageKey: string) {
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => readStoredChecks(storageKey));
+
+  useEffect(() => {
+    window.localStorage.setItem(storageKey, JSON.stringify(checked));
+  }, [checked, storageKey]);
+
+  const toggle = (key: string) => {
+    setChecked((current) => ({ ...current, [key]: !current[key] }));
+  };
+  const reset = () => setChecked({});
+  return { checked, toggle, reset };
+}
+
 function CheckRow({ item, checked, onToggle, hideGroup = false }: { item: ChecklistItem; checked: boolean; onToggle: () => void; hideGroup?: boolean }) {
+  const meta = [
+    hideGroup ? undefined : item.group,
+    item.priority,
+    item.deadline,
+    item.status,
+    item.detail,
+  ].filter(Boolean).join(' · ');
+
   return (
     <label className={`check-item ${checked ? 'checked' : ''}`}>
       <input type="checkbox" checked={checked} onChange={onToggle} />
       <span>
         <strong>{item.label}</strong>
-        <small>{hideGroup ? item.detail : [item.group, item.detail].filter(Boolean).join(' · ')}</small>
+        {meta && <small>{meta}</small>}
       </span>
     </label>
   );
@@ -848,7 +881,7 @@ function readStoredChecks(storageKey: string) {
 }
 
 function checkKey(item: ChecklistItem) {
-  return `${item.group}::${item.label}`;
+  return item.id ?? `${item.group}::${item.label}`;
 }
 
 function DrivingPanel() {
@@ -906,24 +939,141 @@ function DrivingPanel() {
 }
 
 function ChecklistPanel() {
+  const packingChecks = useStoredChecks('norway-iceland-pretrip-packing-v1');
+  const todoChecks = useStoredChecks('norway-iceland-pretrip-todos-v1');
+  const packedCount = preTripChecklist.filter((item) => packingChecks.checked[checkKey(item)]).length;
+  const todoDoneCount = preTripTodos.filter((item) => todoChecks.checked[item.id]).length;
+  const totalCount = preTripChecklist.length + preTripTodos.length;
+  const doneCount = packedCount + todoDoneCount;
+  const progress = totalCount ? Math.round((doneCount / totalCount) * 100) : 0;
+
   return (
-    <main className="content-grid section-shell">
-      <section className="panel wide">
-        <h2><Luggage aria-hidden /> 出发前清单</h2>
-        <PersistentChecklist items={packingList} storageKey="norway-iceland-packing-v2" grouped />
+    <main className="content-grid section-shell pretrip-shell">
+      <section className="panel wide focus-panel pretrip-overview">
+        <div>
+          <h2><Luggage aria-hidden /> 出发前准备</h2>
+          <p className="section-copy">从本地真源生成，适合出发前在手机上逐项勾选。勾选状态保存在当前浏览器。</p>
+        </div>
+        <div className="pretrip-progress" aria-label={`出发前准备完成度 ${progress}%`}>
+          <strong>{progress}%</strong>
+          <span>{doneCount} / {totalCount} 已完成</span>
+        </div>
       </section>
-      <PanelTitle icon={<CheckCircle2 />} title="行前软件">
-        <ul className="clean-list">
-          <li>Google Maps + Maps.me 离线地图。</li>
-          <li>Parka / EasyPark 停车。</li>
-          <li>umferdin.is、Safetravel、Vedur 收藏到浏览器首页。</li>
-        </ul>
+      <section className="panel wide">
+        <h2><CheckCircle2 aria-hidden /> 行李与随身包</h2>
+        <PersistentChecklist
+          items={preTripChecklist}
+          storageKey="norway-iceland-pretrip-packing-v1"
+          grouped
+          checkedState={packingChecks.checked}
+          onToggleKey={packingChecks.toggle}
+        />
+      </section>
+      <PanelTitle icon={<Clock3 />} title="行前待办">
+        <PreTripTodoBoard items={preTripTodos} checked={todoChecks.checked} onToggle={todoChecks.toggle} />
       </PanelTitle>
-      <PanelTitle icon={<Clock3 />} title="手机勾选">
-        <ul className="clean-list">
-          <li>清单状态会保存在本机浏览器里，刷新页面后仍然保留。</li>
-          <li>换手机或清理浏览器数据后需要重新勾选。</li>
-        </ul>
+      <PanelTitle icon={<ShieldAlert />} title="行前规则">
+        <PreTripRuleBoard rules={preTripRules} />
+      </PanelTitle>
+    </main>
+  );
+}
+
+function PreTripTodoBoard({ items, checked, onToggle }: { items: PreTripTodo[]; checked: Record<string, boolean>; onToggle: (key: string) => void }) {
+  const groups = items.reduce<Record<string, PreTripTodo[]>>((acc, item) => {
+    const group = item.deadline || '出发前';
+    acc[group] = [...(acc[group] ?? []), item];
+    return acc;
+  }, {});
+
+  return (
+    <div className="pretrip-todo-groups">
+      {Object.entries(groups).map(([group, groupItems]) => (
+        <section className="pretrip-todo-group" key={group}>
+          <h4>{group}</h4>
+          <div className="check-grid">
+            {groupItems.map((item) => (
+              <label className={`check-item ${checked[item.id] ? 'checked' : ''}`} key={item.id}>
+                <input type="checkbox" checked={Boolean(checked[item.id])} onChange={() => onToggle(item.id)} />
+                <span>
+                  <strong>{item.title}</strong>
+                  <small>{[item.status, item.owner, item.note].filter(Boolean).join(' · ')}</small>
+                  {item.sourceUrl && <TinyLink href={item.sourceUrl} label="来源" icon={<ExternalLink aria-hidden />} />}
+                </span>
+              </label>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function PreTripRuleBoard({ rules }: { rules: PreTripRule[] }) {
+  const groups = rules.reduce<Record<string, PreTripRule[]>>((acc, rule) => {
+    acc[rule.category] = [...(acc[rule.category] ?? []), rule];
+    return acc;
+  }, {});
+
+  return (
+    <div className="pretrip-rule-groups">
+      {Object.entries(groups).map(([category, groupRules]) => (
+        <section className="pretrip-rule-group" key={category}>
+          <h4>{category}</h4>
+          <div className="pretrip-rule-list">
+            {groupRules.map((rule) => (
+              <article className="pretrip-rule-card" key={rule.id}>
+                <strong>{rule.title}</strong>
+                <p>{rule.rule}</p>
+                {rule.action && <small>{rule.action}</small>}
+                {rule.sourceUrl && <TinyLink href={rule.sourceUrl} label="来源" icon={<ExternalLink aria-hidden />} />}
+              </article>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function DailyCheckPanel() {
+  const dailyCheckState = useStoredChecks('norway-iceland-daily-checks-v1');
+  const doneCount = dailyChecks.filter((item) => dailyCheckState.checked[checkKey(item)]).length;
+  const progress = dailyChecks.length ? Math.round((doneCount / dailyChecks.length) * 100) : 0;
+
+  return (
+    <main className="content-grid section-shell pretrip-shell">
+      <section className="panel wide focus-panel pretrip-overview">
+        <div>
+          <h2><Clock3 aria-hidden /> 每日检查</h2>
+          <p className="section-copy">旅途中反复使用的现场检查，不再混在出发前准备里。每天出门、退房、长途自驾前都可以扫一遍。</p>
+        </div>
+        <div className="pretrip-progress" aria-label={`每日检查完成度 ${progress}%`}>
+          <strong>{progress}%</strong>
+          <span>{doneCount} / {dailyChecks.length} 已完成</span>
+        </div>
+      </section>
+      <section className="panel wide">
+        <h2><CheckCircle2 aria-hidden /> 现场检查项</h2>
+        <PersistentChecklist
+          items={dailyChecks}
+          storageKey="norway-iceland-daily-checks-v1"
+          grouped
+          checkedState={dailyCheckState.checked}
+          onToggleKey={dailyCheckState.toggle}
+        />
+        <div className="daily-check-actions">
+          <button type="button" className="reset-checks-button" onClick={dailyCheckState.reset}>
+            <CheckCircle2 aria-hidden />
+            重置每日检查
+          </button>
+        </div>
+      </section>
+      <PanelTitle icon={<Info />} title="使用方式">
+        <div className="inline-info daily-check-note">
+          <Info aria-hidden />
+          <p>每日检查是旅行中的短流程。完成当天检查后可以手动取消勾选，第二天继续复用；它和出发前准备使用不同的本地保存状态。</p>
+        </div>
       </PanelTitle>
     </main>
   );
@@ -945,8 +1095,9 @@ function CostsPanel() {
 
   return (
     <main className="content-grid section-shell">
-      <section className="panel focus-panel">
+      <section className="panel wide focus-panel">
         <h2><CircleDollarSign aria-hidden /> 费用</h2>
+        <p className="section-copy">费用明细暂时隐藏，仅保留预算结构。需要公开时再从真源切换展示。</p>
         <div className="cost-list">
           {costs.map(([label, value]) => (
             <div key={label}>
@@ -955,10 +1106,6 @@ function CostsPanel() {
             </div>
           ))}
         </div>
-      </section>
-      <section className="panel wide">
-        <h2><CheckCircle2 aria-hidden /> 待办</h2>
-        <PersistentChecklist items={todos} storageKey="norway-iceland-todos-v1" />
       </section>
     </main>
   );
