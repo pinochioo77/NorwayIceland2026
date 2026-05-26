@@ -6,7 +6,7 @@ export const preTripChecklist: ChecklistItem[] = [
   {
     "id": "pack-current-01",
     "group": "随身证件包",
-    "label": "护照 / 签证 / 保险单离线版",
+    "label": "证件 / 签证 / 保险单离线版",
     "priority": "高",
     "deadline": "出发前完成",
     "status": "沿用当前网页",
@@ -187,7 +187,7 @@ export const preTripChecklist: ChecklistItem[] = [
   {
     "id": "pack-id-visa-copy",
     "group": "随身证件包",
-    "label": "护照首页 / 签证 / 保险 / 驾照翻译件拍照备份",
+    "label": "证件首页 / 签证 / 保险 / 驾照翻译件拍照备份",
     "detail": "手机本地 + 云端各一份；同行人可互备一份",
     "priority": "高",
     "deadline": "出发前 7 天",
@@ -522,7 +522,7 @@ export const dailyChecks: ChecklistItem[] = [
   {
     "id": "daily-current-21",
     "group": "退房前检查",
-    "label": "护照、钱包、手机、充电器检查",
+    "label": "证件、钱包、手机、充电器检查",
     "detail": "每天退房前",
     "priority": "高",
     "deadline": "每天退房前",

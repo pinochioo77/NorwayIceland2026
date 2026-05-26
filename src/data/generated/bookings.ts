@@ -153,6 +153,33 @@ export const bookings: BookingSummary[] = [
     "sortOrder": 30
   },
   {
+    "id": "sky-lagoon-ser-2026-10-01",
+    "date": "10/1",
+    "attachTime": "10:00-12:00",
+    "kind": "活动",
+    "title": "Sky Lagoon SÉR Online Admission",
+    "vendor": "Sky Lagoon",
+    "location": "Sky Lagoon, Kópavogur",
+    "displayTime": "2026-10-01 10:00",
+    "amount": "ISK 34,980 / 2 adults；折扣后 0 ISK",
+    "status": "已预约",
+    "facts": [
+      "Adult SÉR Online Admission",
+      "2 adults",
+      "票面 34,980 ISK",
+      "折扣后 0 ISK"
+    ],
+    "reminder": "提前到场停车、换衣；公开页只保留日期、时间、人数、金额和供应商摘要。",
+    "links": [
+      {
+        "label": "Sky Lagoon 官方站",
+        "url": "https://www.skylagoon.com/",
+        "kind": "官方"
+      }
+    ],
+    "sortOrder": 45
+  },
+  {
     "id": "blue-ice-cave",
     "date": "10/3",
     "attachTime": "09:30-15:30",
