@@ -113,9 +113,39 @@ export const lodgings: LodgingSummary[] = [
     "sortOrder": 40
   },
   {
+    "id": "b47-continued-9-30",
+    "date": "9/30",
+    "attachTime": "18:10 以后",
+    "name": "B47",
+    "city": "雷克雅未克 / Reykjavík",
+    "checkIn": "2026-09-29",
+    "checkOut": "2026-10-01",
+    "nights": 2,
+    "checkInTime": "15:00后",
+    "checkOutTime": "11:00前",
+    "room": "双人床房-带公共浴室 / Double Bed Room with Shared Bathroom",
+    "area": "13㎡",
+    "bed": "2张单人床",
+    "facilities": [
+      "停车",
+      "大床（视酒店当天情况）",
+      "共用浴室"
+    ],
+    "address": "Barónsstígur 47, 101 Reykjavík, Iceland",
+    "phone": "+3547891100",
+    "platform": "Agoda",
+    "amount": "RMB 1,814.97",
+    "cancelPolicy": "免费取消：雷克雅未克时间 2026-09-22前",
+    "note": "雷克雅内斯半岛返回后继续住 B47，整理温泉和黄金圈次日物品。",
+    "images": [
+      "./assets/lodgings/b47-1.png"
+    ],
+    "sortOrder": 45
+  },
+  {
     "id": "ugla-guesthouse",
     "date": "10/1",
-    "attachTime": "17:20 后",
+    "attachTime": "19:35 以后",
     "name": "Ugla Gistihús (Ugla Guesthouse)",
     "city": "海拉 / Hella",
     "checkIn": "2026-10-01",

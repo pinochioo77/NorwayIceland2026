@@ -339,118 +339,105 @@ export const tripDays: TripDay[] = [
     "date": "9/30",
     "area": "Reykjavik / Reykjanes Peninsula",
     "stay": "Reykjavik / B47",
-    "summary": "雷市早出发走雷克雅内斯半岛：Fagradalsfjall / Stórhóll 徒步、Seltún、Brimketill、Gunnuhver、Reykjanesviti，傍晚回雷市吃饭轻逛。",
-    "meal": "车上午餐 + 雷市晚餐",
+    "summary": "10:00 出发走雷克雅内斯半岛，Fagradalsfjall / Stórhóll 徒步后串联 Seltún、Brimketill、Gunnuhver、Valahnúkamöl，傍晚回雷市轻逛。",
+    "meal": "小猪商店 + 泡面 / 车上简餐",
     "cost": "2,000 RMB",
     "drive": "约2.5-3.5h + 徒步",
     "fuel": "出发前确认油量，半岛不临时找补给",
-    "route": "Reykjavik → Fagradalsfjall / Stórhóll → Seltún → Brimketill → Gunnuhver → Reykjanesviti → Reykjavik",
+    "route": "Reykjavik → Fagradalsfjall / Stórhóll → Seltún → Brimketill → Gunnuhver → Valahnúkamöl → Reykjavik",
     "heroImage": "./assets/places/fagradalsfjall-storholl.jpg",
     "galleryImages": [
       "./assets/places/fagradalsfjall-storholl.jpg",
       "./assets/places/seltun-reykjanes.jpg",
       "./assets/places/brimketill.jpg",
       "./assets/places/gunnuhver.jpg",
-      "./assets/places/valahnukamol-reykjanesviti.jpg",
-      "./assets/places/reykjavik-city.jpg"
+      "./assets/places/valahnukamol-reykjanesviti.jpg"
     ],
     "riskTags": [
       "半岛徒步",
       "风大可删",
-      "早出发"
+      "时间压缩"
     ],
     "timeline": [
       {
-        "time": "08:00",
-        "place": "Reykjavik / B47",
-        "title": "雷市出发",
+        "time": "10:00-10:50",
+        "place": "Reykjavik / B47 → Fagradalsfjall",
+        "title": "雷市出发，前往火山徒步区",
         "transport": "自驾",
-        "note": "建议早点出发，避开下午风大和天气变差。",
+        "note": "按截图主计划收口到 10:00 出发；出发前确认风、雨、油量和徒步装备。",
         "required": true
       },
       {
-        "time": "08:50-09:10",
+        "time": "10:50-11:10",
         "place": "Fagradalsfjall 停车场 P1/P2",
-        "title": "停车、上厕所、整理徒步装备",
-        "note": "徒步前确认风、雨、鞋袜和补水。",
+        "title": "停车、厕所、整理徒步装备",
+        "note": "徒步前确认防风、防水、补水和离线地图。",
         "required": true
       },
       {
-        "time": "09:10-11:40",
+        "time": "11:10-13:30",
         "place": "Stórhóll View Point / Fagradalsfjall",
-        "title": "徒步到 Stórhóll View Point 往返",
+        "title": "Fagradalsfjall / Stórhóll 徒步往返",
         "transport": "徒步",
-        "note": "按 2.5 小时预算，含拍照休息；风大或雨大则缩短或取消。",
+        "note": "按 2 小时以上预留，含拍照休息；风大或雨大则缩短或取消。",
         "required": true
       },
       {
-        "time": "11:40-12:00",
+        "time": "13:30-14:00",
         "place": "Fagradalsfjall 停车场",
-        "title": "回车上休整",
-        "note": "换袜子、补水、吃能量棒。"
+        "title": "回车休整 + 简单午餐",
+        "note": "换袜子、补水、吃能量棒或三明治，不专门找餐厅。"
       },
       {
-        "time": "12:00-12:30",
-        "place": "车上简餐",
-        "title": "简单午餐",
-        "note": "建议车上吃三明治、热水、零食，不专门找餐厅浪费时间。"
-      },
-      {
-        "time": "12:45-13:25",
+        "time": "14:20-15:00",
         "place": "Seltún Geothermal Area",
         "title": "Seltún 地热区",
         "note": "彩色地热、蒸汽和硫磺地貌，轻松短停。",
         "required": true
       },
       {
-        "time": "13:50-14:15",
+        "time": "15:20-15:45",
         "place": "Brimketill",
         "title": "熔岩海池、黑色岩岸",
-        "note": "看海浪冲黑色岩岸；风大可缩短。"
+        "note": "看海浪冲黑色岩岸；风大时缩短停留。"
       },
       {
-        "time": "14:35-15:10",
+        "time": "16:05-16:35",
         "place": "Gunnuhver",
         "title": "Gunnuhver 大蒸汽地热点",
-        "note": "半岛最有冲击力的地热点之一，蒸汽强、末日感强。",
+        "note": "蒸汽强、视觉冲击大，注意风向和步道边界。",
         "required": true
       },
       {
-        "time": "15:15-16:00",
+        "time": "16:40-17:20",
         "place": "Valahnúkamöl / Reykjanesviti",
         "title": "黑海岸、灯塔、海崖",
         "note": "世界尽头感强；风大时只短停拍照。"
       },
       {
-        "time": "16:00-17:00",
+        "time": "17:20-18:10",
         "place": "Reykjanes Peninsula → Reykjavik",
         "title": "开回雷市",
         "transport": "自驾",
-        "note": "如果天气差或累了，直接回雷市。",
+        "note": "如果天气差或累了，直接回住宿。",
         "required": true
       },
       {
-        "time": "17:30以后",
+        "time": "18:10 以后",
         "place": "Reykjavik city center",
         "title": "雷市吃饭 + 轻逛",
         "note": "Laugavegur、彩虹街、教堂周边轻松走走。"
       }
     ],
     "reminders": [
-      "半岛天气和风很影响体验，出发前看 Vedur、Safetravel 和路况。",
-      "徒步段按 2.5 小时预算；风大、雨大或能见度差，优先删徒步或缩短半岛点。",
-      "Sky Lagoon 已改到 10/1 上午，9/30 不再安排温泉。"
+      "雷克雅内斯半岛天气和风很影响体验，出发前看 Vedur、Safetravel 和路况。",
+      "Fagradalsfjall / Stórhóll 徒步按天气缩短；风雨差时优先保留 Seltún、Gunnuhver 等短停点。"
     ],
     "links": [
       {
         "label": "当天地图",
         "url": "https://www.google.com/maps/dir/B47%20Reykjavik/Fagradalsfjall%20Parking%20P1/Selt%C3%BAn/Brimketill/Gunnuhver/Valahn%C3%BAkam%C3%B6l/Reykjanesviti/B47%20Reykjavik",
         "kind": "地图"
-      },
-      {
-        "label": "Visit Reykjanes - Fagradalsfjall",
-        "url": "https://www.visitreykjanes.is/en/destinations/the-volcanic-way/fagradalsfjall",
-        "kind": "介绍"
       },
       {
         "label": "Visit Reykjanes",
@@ -463,39 +450,39 @@ export const tripDays: TripDay[] = [
     "date": "10/1",
     "area": "Sky Lagoon / Golden Circle / Hella",
     "stay": "Hella / Ugla Guesthouse",
-    "summary": "上午 10:00 Sky Lagoon，下午压缩黄金圈，优先 Thingvellir、Geysir、Gullfoss；Kerið 只作为天气和体力都很好时的备选。",
+    "summary": "上午 Sky Lagoon 温泉，下午压缩黄金圈：辛格维利尔、间歇泉、Brúarfoss 蓝色秘境瀑布、黄金瀑布，结束后前往 Hella 入住。",
     "meal": "温泉简餐 / 泡面",
     "cost": "1,063 RMB",
     "drive": "约4.5-5.5h",
     "fuel": "离开雷市前或返程经 Selfoss 视油量补给",
-    "route": "Reykjavik → Sky Lagoon → Thingvellir → Geysir → Gullfoss → Hella",
+    "route": "Reykjavik → Sky Lagoon → Thingvellir → Geysir → Brúarfoss → Gullfoss → Hella",
     "heroImage": "./assets/places/sky-lagoon.jpg",
     "galleryImages": [
       "./assets/places/sky-lagoon.jpg",
       "./assets/places/thingvellir.jpg",
       "./assets/places/geysir.jpg",
-      "./assets/places/gullfoss.jpg",
-      "./assets/places/golden-circle-road.jpg"
+      "./assets/places/bruarfoss.jpg",
+      "./assets/places/gullfoss.jpg"
     ],
     "riskTags": [
-      "10:00 温泉预约",
+      "温泉预约",
       "黄金圈压缩版",
-      "Kerið 可删"
+      "Brúarfoss 时间控制"
     ],
     "timeline": [
       {
-        "time": "08:30-09:15",
+        "time": "08:00-08:40",
         "place": "B47 → Sky Lagoon",
         "title": "退房装车，开往 Sky Lagoon",
         "transport": "自驾",
-        "note": "把温泉用品和当天证件放在容易拿的位置。",
+        "note": "温泉用品和当天证件放在容易拿的位置。",
         "required": true
       },
       {
         "time": "09:15-09:50",
         "place": "Sky Lagoon",
         "title": "到场停车、换衣、准备",
-        "note": "预约 10:00，留出停车和更衣缓冲。",
+        "note": "10:00 预约入场，留出停车和更衣缓冲。",
         "required": true
       },
       {
@@ -503,67 +490,83 @@ export const tripDays: TripDay[] = [
         "place": "Sky Lagoon",
         "title": "Sky Lagoon 温泉",
         "transport": "活动",
-        "note": "按 10:00 预约入场，上午完成温泉，不再放到 9/30。",
+        "note": "上午完成温泉，下午转入压缩黄金圈。",
         "required": true
       },
       {
         "time": "12:00-12:30",
         "place": "Sky Lagoon",
         "title": "简单午餐 / 换衣",
-        "note": "不要拖太晚，下午黄金圈为压缩版。"
+        "note": "不要拖太晚，下午黄金圈节点较紧。"
       },
       {
-        "time": "12:30-13:30",
+        "time": "12:30-13:35",
         "place": "Sky Lagoon → Thingvellir",
         "title": "驾驶：Sky Lagoon → 辛格维利尔",
         "transport": "自驾",
-        "note": "下午开始黄金圈，按路况控制节奏。"
+        "note": "下午开始黄金圈，按路况控制节奏。",
+        "required": true
       },
       {
-        "time": "13:30-14:30",
+        "time": "13:35-14:20",
         "place": "Thingvellir National Park",
         "title": "游览：裂谷、观景步道",
         "note": "压缩游览，重点看裂谷和主步道。",
         "required": true
       },
       {
-        "time": "14:30-15:20",
+        "time": "14:20-15:10",
         "place": "Thingvellir → Geysir",
         "title": "驾驶：辛格维利尔 → Geysir",
         "transport": "自驾",
-        "note": "中途不加额外景点。"
+        "note": "中途不加额外景点。",
+        "required": true
       },
       {
-        "time": "15:20-16:05",
+        "time": "15:10-15:45",
         "place": "Geysir Geothermal Area",
         "title": "游览：Strokkur 喷发",
         "note": "看几轮喷发后收口。",
         "required": true
       },
       {
-        "time": "16:05-16:20",
-        "place": "Geysir → Gullfoss",
-        "title": "驾驶：Geysir → Gullfoss",
+        "time": "15:45-16:25",
+        "place": "Geysir → Brúarfoss",
+        "title": "驾驶：Geysir → Brúarfoss",
         "transport": "自驾",
-        "note": "短驾驶段，停车和步行留余量。"
+        "note": "Brúarfoss 只保留蓝色瀑布核心停留。"
       },
       {
-        "time": "16:20-17:10",
-        "place": "Gullfoss Waterfall",
-        "title": "游览：主观景台 + 步道",
-        "note": "黄金瀑布风大水汽重，步道按天气选择。",
+        "time": "16:25-17:00",
+        "place": "Brúarfoss",
+        "title": "Brúarfoss 蓝色秘境瀑布",
+        "note": "蓝色水流很有辨识度；时间紧则只做短停拍照。",
         "required": true
       },
       {
-        "time": "17:10-18:35",
+        "time": "17:00-17:35",
+        "place": "Brúarfoss → Gullfoss",
+        "title": "驾驶：Brúarfoss → Gullfoss",
+        "transport": "自驾",
+        "note": "进入黄金瀑布前留停车和步行时间。"
+      },
+      {
+        "time": "17:35-18:15",
+        "place": "Gullfoss Waterfall",
+        "title": "游览：黄金瀑布观景台",
+        "note": "风大水汽重，步道按天气选择。",
+        "required": true
+      },
+      {
+        "time": "18:15-19:35",
         "place": "Gullfoss → Hella / Ugla Guesthouse",
         "title": "驾驶：Gullfoss → Hella",
         "transport": "自驾",
-        "note": "Kerið 不放主线；天气和体力都很好时才考虑临时加。",
+        "note": "结束黄金圈，直接去 Hella 入住。",
         "required": true
       },
       {
-        "time": "18:35 后",
+        "time": "19:35 以后",
         "place": "Ugla Guesthouse",
         "title": "入住、晚餐、休息",
         "note": "整理第二天南岸早出发物品。",
@@ -571,20 +574,24 @@ export const tripDays: TripDay[] = [
       }
     ],
     "reminders": [
-      "Sky Lagoon 是 10:00 预约，上午完成温泉后再出发黄金圈。",
-      "下午黄金圈只保核心三点：Thingvellir、Geysir、Gullfoss；Kerið 作为备选。",
-      "温泉结束晚或天气差时，压缩 Thingvellir / Geysir，优先准时到 Hella 住宿。"
+      "Sky Lagoon 上午完成；下午黄金圈为压缩版，不追加 Kerið。",
+      "Brúarfoss 与 Gullfoss 都要控制停留，优先准时到 Hella 住宿。"
     ],
     "links": [
       {
         "label": "当天地图",
-        "url": "https://www.google.com/maps/dir/B47%20Reykjavik/Sky%20Lagoon/Thingvellir%20National%20Park/Geysir/Gullfoss/Ugla%20Guesthouse%20Hella",
+        "url": "https://www.google.com/maps/dir/B47%20Reykjavik/Sky%20Lagoon/Thingvellir%20National%20Park/Geysir/Br%C3%BAarfoss/Gullfoss/Ugla%20Guesthouse%20Hella",
         "kind": "地图"
       },
       {
         "label": "Sky Lagoon 官方站",
         "url": "https://www.skylagoon.com/",
         "kind": "官方"
+      },
+      {
+        "label": "Brúarfoss 介绍",
+        "url": "https://guidetoiceland.is/travel-iceland/drive/bruarfoss",
+        "kind": "介绍"
       }
     ]
   },
@@ -592,20 +599,15 @@ export const tripDays: TripDay[] = [
     "date": "10/2",
     "area": "南岸 / Vik / Hali",
     "stay": "Hali / Skyrhúsið Guesthouse",
-    "summary": "南岸景点密集日，按天气和体力收口；傍晚以后不再补点，优先完成住宿方向的长驾驶段。",
-    "meal": "泡面",
+    "summary": "南岸经典瀑布和黑沙滩日：塞里雅兰瀑布、Gljúfrabúi、Skógafoss、Kvernufoss、Dyrhólaey、Reynisfjara，傍晚收口后前往 Hali 住宿。",
+    "meal": "泡面 / Skógar 或 Vík 简餐",
     "cost": "1,030 RMB",
     "drive": "长距离日，含 Vik → Hali 夜间段",
     "fuel": "Hella 满油出发，Vik 再补给",
-    "route": "Hella → Seljalandsfoss → Skogafoss → Vik → Hali",
-    "heroImage": "./assets/trip/excel-image9.jpeg",
+    "route": "Hella → Seljalandsfoss → Gljúfrabúi → Skógafoss → Kvernufoss → Dyrhólaey → Reynisfjara → Hali",
+    "heroImage": "./assets/places/seljalandsfoss.jpg",
     "galleryImages": [
-      "./assets/trip/excel-image9.jpeg",
-      "./assets/trip/excel-image10.jpeg",
-      "./assets/trip/excel-image11.jpeg",
-      "./assets/trip/excel-image12.jpeg",
-      "./assets/trip/excel-image13.jpeg",
-      "./assets/trip/excel-image14.jpeg"
+      "./assets/places/seljalandsfoss.jpg?./assets/places/gljufrabui.jpg?./assets/places/skogafoss.jpg?./assets/places/kvernufoss.jpg?./assets/places/dyrholaey.jpg?./assets/places/reynisfjara-black-sand-beach.jpg"
     ],
     "riskTags": [
       "疯狗浪",
@@ -614,68 +616,108 @@ export const tripDays: TripDay[] = [
     ],
     "timeline": [
       {
-        "time": "08:00-08:30",
-        "place": "Hella / Ugla Guesthouse",
-        "title": "退房、装车",
+        "time": "08:30-09:20",
+        "place": "Hella / Ugla Guesthouse → Seljalandsfoss",
+        "title": "退房装车，开往塞里雅兰瀑布",
+        "transport": "自驾",
+        "note": "出发前看天气和风速。",
         "required": true
       },
       {
-        "time": "09:25-10:45",
-        "place": "Seljalandsfoss + Gljufrabui",
-        "title": "两个瀑布一起玩",
+        "time": "09:20-10:05",
+        "place": "Seljalandsfoss",
+        "title": "塞里雅兰瀑布 Seljalandsfoss",
+        "note": "绕后步道防水防滑，水汽大时控制停留。",
         "required": true
       },
       {
-        "time": "11:15-12:15",
-        "place": "Skogafoss",
-        "title": "瀑布、观景平台视体力选择"
+        "time": "10:05-10:35",
+        "place": "Gljúfrabúi",
+        "title": "Gljúfrabúi 隐藏瀑布",
+        "transport": "步行",
+        "note": "峡谷隐藏瀑布，鞋和外层尽量防水。",
+        "required": true
       },
       {
-        "time": "12:35-13:20",
+        "time": "10:35-11:25",
+        "place": "Seljalandsfoss → Skógafoss",
+        "title": "驾驶：前往 Skógafoss",
+        "transport": "自驾",
+        "note": "南岸经典公路，按天气控制速度。"
+      },
+      {
+        "time": "11:25-12:15",
+        "place": "Skógafoss",
+        "title": "斯科加瀑布 Skógafoss",
+        "note": "底部 + 爬顶两个体验，按体力选择。",
+        "required": true
+      },
+      {
+        "time": "12:15-12:30",
+        "place": "Skógafoss → Kvernufoss",
+        "title": "驾驶：前往 Kvernufoss 停车点",
+        "transport": "自驾",
+        "note": "距离很近，给停车和步行留余量。"
+      },
+      {
+        "time": "12:30-13:20",
         "place": "Kvernufoss",
-        "title": "小众瀑布",
-        "note": "雨大或体力差则删除。"
+        "title": "克维努瀑布 Kvernufoss",
+        "note": "轻徒步，瀑布后方很值得去；体力差则删。",
+        "required": true
       },
       {
-        "time": "14:00-15:00",
-        "place": "Dyrholaey",
-        "title": "海岬、拱门、黑沙滩远景"
+        "time": "13:20-14:10",
+        "place": "Skógar / 车上",
+        "title": "午餐 + 前往 Dyrhólaey",
+        "transport": "自驾",
+        "note": "Skógar 附近或车上解决，不为餐厅绕远。"
       },
       {
-        "time": "15:15-16:15",
+        "time": "14:10-15:00",
+        "place": "Dyrhólaey",
+        "title": "Dyrhólaey 灯塔、海蚀门、海岸线",
+        "note": "看海蚀门、灯塔和黑沙滩远景。",
+        "required": true
+      },
+      {
+        "time": "15:15-16:30",
         "place": "Reynisfjara Black Sand Beach",
-        "title": "黑沙滩游览",
-        "note": "注意疯狗浪，不靠近浪线。",
+        "title": "Reynisfjara 黑沙滩",
+        "note": "玄武岩柱、黑沙、海蚀柱；小心海浪，不背对海。",
         "required": true
       },
       {
-        "time": "16:15-17:00",
-        "place": "Vik",
-        "title": "加油、厕所、补给、休息",
+        "time": "16:30-17:30",
+        "place": "Vík",
+        "title": "补给、厕所、晚餐准备、极光准备",
+        "note": "按截图主计划 17:30 收口；只做必要补给。",
         "required": true
       },
       {
-        "time": "17:00-20:15",
-        "place": "Vik → Hali / Skyrhúsið Guesthouse",
-        "title": "长距离开往冰河湖附近住宿",
-        "note": "按路况和体力收口，路上只做必要短停。",
+        "time": "17:30-20:15",
+        "place": "Vík → Hali / Skyrhúsið Guesthouse",
+        "title": "前往 Hali 住宿",
+        "transport": "自驾",
+        "note": "按路况和体力控制节奏，路上只做必要短停。",
         "required": true
       },
       {
         "time": "20:15 后",
         "place": "Skyrhúsið Guesthouse",
-        "title": "入住、简单晚餐、整理徒步装备"
+        "title": "入住、简单晚餐、整理冰川装备",
+        "note": "整理 10/3 冰川活动装备。",
+        "required": true
       }
     ],
     "reminders": [
-      "出发前查 umferdin.is、Safetravel、Vedur。",
       "黑沙滩不背对海浪，不靠近湿沙浪线。",
-      "如果傍晚仍在 Vík，只做补给和厕所，不再增加景点。"
+      "17:30 后以收口和住宿方向为主，不再临时加景点。"
     ],
     "links": [
       {
         "label": "当天地图",
-        "url": "https://www.google.com/maps/dir/Hella/Seljalandsfoss/Sk%C3%B3gafoss/Kvernufoss/Dyrh%C3%B3laey/Reynisfjara/V%C3%ADk/Skyrh%C3%BAsi%C3%B0+Guesthouse",
+        "url": "https://www.google.com/maps/dir/Hella/Seljalandsfoss/Glj%C3%BAfrab%C3%BAi/Sk%C3%B3gafoss/Kvernufoss/Dyrh%C3%B3laey/Reynisfjara/V%C3%ADk/Skyrh%C3%BAsi%C3%B0+Guesthouse",
         "kind": "地图"
       },
       {
