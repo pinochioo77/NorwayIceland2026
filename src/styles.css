@@ -84,6 +84,27 @@ svg {
   stroke-width: 2.2;
 }
 
+.motion-root .site-header,
+.motion-root .hero-copy,
+.motion-root .countdown-card,
+.motion-root .metric,
+.motion-root .weather-card,
+.motion-root .review-strip,
+.motion-root .day-cover,
+.motion-root .timeline-row,
+.motion-root .panel,
+.motion-root .panel-title,
+.motion-root .booking-body,
+.motion-root .check-item {
+  will-change: transform, opacity;
+}
+
+.motion-root .cover-slide img,
+.motion-root .node-image img,
+.motion-root .lodging-gallery img {
+  will-change: transform;
+}
+
 #root {
   min-height: 100vh;
 }
@@ -312,7 +333,7 @@ svg {
   max-width: 790px;
   margin: 0;
   color: #0b1220;
-  font-size: var(--text-display);
+  font-size: clamp(2.9rem, 5.2vw, 4.75rem);
   font-weight: 900;
   line-height: 0.92;
   word-break: keep-all;
@@ -2213,5 +2234,20 @@ svg {
   .parking-note,
   .timeline-card p {
     font-size: 0.88rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .motion-root *,
+  .motion-root *::before,
+  .motion-root *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
   }
 }

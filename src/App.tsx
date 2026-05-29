@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   AlertTriangle,
   CalendarDays,
@@ -30,6 +33,8 @@ import { dailyChecks, preTripChecklist, preTripRules, preTripTodos } from './dat
 import { officialLinks } from './data/links';
 import { totalCost, tripDays } from './data/trip';
 import type { BookingSummary, ChecklistItem, LodgingSummary, MetricProps, PlaceInfo, PreTripRule, PreTripTodo, SourceLink, TripDay } from './types';
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const tabs = ['每日行程', '自驾与路况', '出发前准备', '每日检查', '费用', '紧急联系'] as const;
 type Tab = (typeof tabs)[number];
@@ -214,13 +219,37 @@ const placeNameRules: Array<[string, string]> = [
 ];
 
 export function App() {
+  const shellRef = useRef<HTMLDivElement>(null);
   const [activeDay, setActiveDay] = useState(tripDays[0].date);
   const [activeTab, setActiveTab] = useState<Tab>('每日行程');
   const tripClock = useTripClock();
   const currentDay = tripDays.find((day) => day.date === activeDay) ?? tripDays[0];
 
+  useGSAP(() => {
+    if (shouldReduceMotion()) return;
+
+    gsap.timeline({ defaults: { ease: 'power3.out' } })
+      .from('.site-header', { autoAlpha: 0, y: -22, duration: 0.55 })
+      .from('.hero-copy', { autoAlpha: 0, y: 44, scale: 0.985, duration: 0.78 }, '-=0.18')
+      .from('.countdown-card', { autoAlpha: 0, y: 34, scale: 0.97, duration: 0.7 }, '-=0.38')
+      .from('.status-grid > *', { autoAlpha: 0, y: 24, scale: 0.98, duration: 0.55, stagger: 0.07 }, '-=0.34')
+      .from('.review-strip', { autoAlpha: 0, y: 22, duration: 0.52 }, '-=0.18')
+      .from('.day-nav button', { autoAlpha: 0, x: -18, duration: 0.42, stagger: 0.025 }, '-=0.18');
+  }, { scope: shellRef });
+
+  useGSAP(() => {
+    if (shouldReduceMotion()) return;
+
+    const targets = gsap.utils.toArray<HTMLElement>(
+      '.content-grid > .panel, .content-grid > .panel-title, .pretrip-todo-group, .pretrip-rule-group, .check-group',
+    );
+    if (!targets.length) return;
+
+    revealFromBelow(targets, { y: 18, duration: 0.5, stagger: 0.045 });
+  }, { scope: shellRef, dependencies: [activeTab], revertOnUpdate: true });
+
   return (
-    <div className="app-shell">
+    <div className="app-shell motion-root" ref={shellRef}>
       <header className="site-header">
         <a className="brand-lockup" href="#top" aria-label="Escape 66 North">
           <img className="brand-logo" src="./assets/brand/logo-small.png" alt="" aria-hidden />
@@ -319,6 +348,27 @@ function durationParts(ms: number) {
   const minutes = totalMinutes % 60;
   const seconds = totalSeconds % 60;
   return { days, hours, minutes, seconds };
+}
+
+function shouldReduceMotion() {
+  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function revealFromBelow(targets: Parameters<typeof gsap.fromTo>[0], vars: Parameters<typeof gsap.to>[1] = {}) {
+  return gsap.fromTo(
+    targets,
+    { autoAlpha: 0, y: 22, filter: 'blur(8px)' },
+    {
+      autoAlpha: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      duration: 0.62,
+      ease: 'power3.out',
+      stagger: 0.06,
+      clearProps: 'filter',
+      ...vars,
+    },
+  );
 }
 
 function maskMoney(value?: string) {
@@ -443,6 +493,7 @@ function weatherCodeText(code: number) {
 }
 
 function DayDetail({ day }: { day: TripDay }) {
+  const detailRef = useRef<HTMLElement>(null);
   const dayWarning = criticalDayWarnings[day.date];
   const dayBookings = bookings.filter((booking) => booking.date === day.date);
   const dayLodgings = lodgings.filter((lodging) => lodging.date === day.date);
@@ -453,8 +504,62 @@ function DayDetail({ day }: { day: TripDay }) {
   const showDrive = Boolean(day.drive && !day.drive.includes('非自驾'));
   const showFuel = Boolean(showDrive && day.fuel && !day.fuel.includes('按当天状态'));
 
+  useGSAP(() => {
+    if (shouldReduceMotion()) return;
+
+    const cover = detailRef.current?.querySelector('.day-cover');
+    const facts = gsap.utils.toArray<HTMLElement>('.quick-facts .fact');
+    const rows = gsap.utils.toArray<HTMLElement>('.timeline-row');
+    const splitPanels = gsap.utils.toArray<HTMLElement>('.split-panels .panel-title');
+
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    if (cover) {
+      tl.fromTo(cover, { autoAlpha: 0, y: 28, scale: 0.985 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.72 })
+        .fromTo('.cover-slide img', { scale: 1.075 }, { scale: 1, duration: 1.15, ease: 'power2.out' }, '<');
+    }
+    if (facts.length) {
+      tl.fromTo(
+        facts,
+        { autoAlpha: 0, y: 22, scale: 0.975 },
+        { autoAlpha: 1, y: 0, scale: 1, duration: 0.48, stagger: 0.05 },
+        '-=0.34',
+      );
+    }
+
+    gsap.set(rows, { autoAlpha: 0, y: 34 });
+    rows.forEach((row, index) => {
+      gsap.to(row, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.6,
+        ease: 'power2.out',
+        delay: Math.min(index * 0.025, 0.16),
+        scrollTrigger: {
+          trigger: row,
+          start: 'top 88%',
+          once: true,
+        },
+      });
+    });
+
+    if (splitPanels.length) {
+      ScrollTrigger.batch(splitPanels, {
+        start: 'top 90%',
+        once: true,
+        onEnter: (batch) => revealFromBelow(batch, { duration: 0.52, stagger: 0.08 }),
+      });
+    }
+
+    detailRef.current?.querySelectorAll('img').forEach((image) => {
+      if (image.complete) return;
+      image.addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
+    });
+
+    ScrollTrigger.refresh();
+  }, { scope: detailRef, dependencies: [day.date], revertOnUpdate: true });
+
   return (
-    <article className="day-detail">
+    <article className="day-detail motion-day" ref={detailRef}>
       <section className="day-cover">
         <div className="cover-carousel" aria-label={`${day.area} 图片轮播`}>
           {dayVisuals.map((visual, index) => (
@@ -624,9 +729,37 @@ function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: s
   );
 }
 
+function useDetailsReveal() {
+  const bodyRef = useRef<HTMLDivElement>(null);
+
+  const onToggle = () => {
+    if (shouldReduceMotion() || !bodyRef.current) return;
+
+    const details = bodyRef.current.closest('details');
+    if (!(details instanceof HTMLDetailsElement) || !details.open) return;
+
+    gsap.fromTo(
+      bodyRef.current,
+      { autoAlpha: 0, y: -8, clipPath: 'inset(0 0 100% 0)' },
+      {
+        autoAlpha: 1,
+        y: 0,
+        clipPath: 'inset(0 0 0% 0)',
+        duration: 0.34,
+        ease: 'power2.out',
+        clearProps: 'clipPath',
+      },
+    );
+  };
+
+  return { bodyRef, onToggle };
+}
+
 function BookingInline({ booking }: { booking: BookingSummary }) {
+  const { bodyRef, onToggle } = useDetailsReveal();
+
   return (
-    <details className="booking-inline">
+    <details className="booking-inline" onToggle={onToggle}>
       <summary>
         <span className="booking-kind">{booking.kind}</span>
         <span className="booking-summary-main">
@@ -635,7 +768,7 @@ function BookingInline({ booking }: { booking: BookingSummary }) {
         </span>
         <ChevronDown aria-hidden />
       </summary>
-      <div className="booking-body">
+      <div className="booking-body" ref={bodyRef}>
         <dl className="booking-facts">
           <div><dt>时间</dt><dd>{booking.displayTime}</dd></div>
           <div><dt>地点</dt><dd>{displayPlaceName(booking.location, booking.title)}</dd></div>
@@ -656,8 +789,10 @@ function BookingInline({ booking }: { booking: BookingSummary }) {
 }
 
 function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
+  const { bodyRef, onToggle } = useDetailsReveal();
+
   return (
-    <details className="booking-inline lodging-inline">
+    <details className="booking-inline lodging-inline" onToggle={onToggle}>
       <summary>
         <span className="booking-kind">住宿</span>
         <span className="booking-summary-main">
@@ -666,7 +801,7 @@ function LodgingInline({ lodging }: { lodging: LodgingSummary }) {
         </span>
         <ChevronDown aria-hidden />
       </summary>
-      <div className="booking-body lodging-body">
+      <div className="booking-body lodging-body" ref={bodyRef}>
         {lodging.images.length > 0 && (
           <div className="lodging-gallery" aria-label={`${lodging.name} 图片`}>
             {lodging.images.map((image) => (
@@ -865,6 +1000,7 @@ function useStoredChecks(storageKey: string) {
 }
 
 function CheckRow({ item, checked, onToggle, hideGroup = false }: { item: ChecklistItem; checked: boolean; onToggle: () => void; hideGroup?: boolean }) {
+  const itemRef = useRef<HTMLLabelElement>(null);
   const meta = [
     hideGroup ? undefined : item.group,
     item.priority,
@@ -873,8 +1009,13 @@ function CheckRow({ item, checked, onToggle, hideGroup = false }: { item: Checkl
     item.detail,
   ].filter(Boolean).join(' · ');
 
+  useEffect(() => {
+    if (!checked || shouldReduceMotion() || !itemRef.current) return;
+    gsap.fromTo(itemRef.current, { scale: 0.985 }, { scale: 1, duration: 0.24, ease: 'back.out(1.8)' });
+  }, [checked]);
+
   return (
-    <label className={`check-item ${checked ? 'checked' : ''}`}>
+    <label className={`check-item ${checked ? 'checked' : ''}`} ref={itemRef}>
       <input type="checkbox" checked={checked} onChange={onToggle} />
       <span>
         <strong>{item.label}</strong>
